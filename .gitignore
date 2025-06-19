@@ -1,0 +1,32 @@
+.DS_Store
+
+# Ignore build artifacts
+/build/
+*.o
+*.obj
+*.so
+*.a
+*.lib
+*.dll
+*.exe
+*.out
+
+# CMake build files
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+
+# Environment files
+.env
+
+# Logs
+*.log
+
+# Core dumps
+core
+
+# Ignore backup/swap files
+*~
+*.swp
+*.swo
