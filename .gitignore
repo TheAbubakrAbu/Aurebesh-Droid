@@ -19,6 +19,7 @@ Makefile
 
 # Environment files
 .env
+token.txt
 
 # Logs
 *.log

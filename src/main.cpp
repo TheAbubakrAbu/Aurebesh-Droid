@@ -1,26 +1,31 @@
 #include <iostream>
+#include <fstream>
 
 #include <dpp/dpp.h>
-#include <cstdlib>
-#include "dotenv.h"
 
 int main() {
-    dotenv::load();
-
-    const char* token = std::getenv("DISCORD_TOKEN");
-    if (!token) {
-        std::cerr << "Missing DISCORD_TOKEN in .env file." << std::endl;
+    std::ifstream token_file("../token.txt");
+    if (!token_file.is_open()) {
+        std::cerr << "Could not open token.txt\n";
         return 1;
     }
 
-    std::cout << "Loaded token: " << token << std::endl;
-    std::string BOT_TOKEN{token};
+    std::string token;
+    std::getline(token_file, token);
+    if (token.empty()) {
+        std::cerr << "token.txt is empty\n";
+        return 1;
+    }
 
-    dpp::cluster bot(BOT_TOKEN);
+    dpp::cluster bot(token, dpp::i_default_intents);
 
-    bot.on_ready([&bot](const dpp::ready_t& event){
-      std::cout << "Bot is up: " << bot.me.username << "\n";
+    dpp::activity activity(dpp::activity_type::at_game, "Aurebesh", "", "");
+    dpp::presence presence(dpp::ps_online, activity);
+    bot.set_presence(presence);
+
+    bot.on_ready([&bot](const dpp::ready_t&) {
+        std::cout << "Bot is up: " << bot.me.username << '\n';
     });
-    
+
     bot.start(dpp::st_wait);
 }
