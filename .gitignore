@@ -20,6 +20,7 @@ Makefile
 # Environment files
 .env
 token.txt
+.vscode
 
 # Logs
 *.log

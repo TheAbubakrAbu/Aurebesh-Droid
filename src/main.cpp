@@ -1,7 +1,17 @@
+// main.cpp
+
 #include <iostream>
 #include <fstream>
 
 #include <dpp/dpp.h>
+
+#include "aurebesh.hpp"
+
+void displayLetters() {
+    for(int i = 0; i < 26; ++i) {
+        std::cout << aurebeshLetters[i].aurebeshName;
+    }
+}
 
 int main() {
     std::ifstream token_file("../token.txt");
@@ -28,4 +38,6 @@ int main() {
     });
 
     bot.start(dpp::st_wait);
+
+    displayLetters();
 }
