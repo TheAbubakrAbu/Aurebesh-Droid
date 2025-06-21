@@ -1,12 +1,10 @@
-# Aurebehs Droid - Discord Bot
+# Aurebesh Droid - Discord Bot
 
 Aurebesh Droid is a work-in-progress Discord bot that brings the iconic Star Wars writing system, Aurebesh, to life. Inspired by the droids and datapads of the Star Wars universe, this bot is designed to serve as a fun language tool, immersive companion, and experimental platform for new Star Wars features.
 
 [**Add Aurebesh Droid to Your Server**](https://discord.ly/aurebesh-droid)
 
-Created by Abubakr Elmallah on **June 18, 2025**.
-
----
+Created by **Abubakr Elmallah** on **June 18, 2025**.
 
 ## Features (Planned)
 
@@ -15,8 +13,6 @@ Created by Abubakr Elmallah on **June 18, 2025**.
 * **Mini-Games** (Future): Guess-the-word in Aurebesh.
 * **Lore Integration** (Future): Pull data from in-universe planets, ships, or characters.
 * **Bot Personality**: Replies like a Star Wars droid.
-
----
 
 ## Getting Started
 
@@ -53,15 +49,11 @@ Created by Abubakr Elmallah on **June 18, 2025**.
    ./AurebeshDroid
    ```
 
----
-
 ## Privacy & Data
 
 **Aurebesh Droid** respects your privacy:
 - **No Personal Data Collected** – Only temporary game data is stored.
 - **Secure & Compliant** – Fully adheres to Discord’s Terms of Service and Privacy Policy.
-
----
 
 ## License
 
