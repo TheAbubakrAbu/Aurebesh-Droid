@@ -1,38 +1,20 @@
-# Sabacc Droid - Discord Bot
+# Aurebehs Droid - Discord Bot
 
-*Supports Corellian Spike, Coruscant Shift, Kessel, and Traditional Sabacc*
+Aurebesh Droid is a work-in-progress Discord bot that brings the iconic Star Wars writing system, Aurebesh, to life. Inspired by the droids and datapads of the Star Wars universe, this bot is designed to serve as a fun language tool, immersive companion, and experimental platform for new Star Wars features.
 
-Welcome to the **Sabacc Droid**! This project brings the classic Star Wars card game Sabacc to life with multiple exciting versions:
+- **Add Aurebesh Droid to Your Server**: [Invite Link](https://discord.ly/aurebesh-droid)
 
-1. **Console Version (`sabacc_console.py`)**: Play the Corellian Spike variant (prototype of Sabacc Droid) in your terminal or IDE.
-2. **Discord Bot Version (`sabacc_droid.py`)**: Play Corellian Spike, Coruscant Shift, Kessel, and Traditional Sabacc by creating your own Discord bot. Or simply invite the bot to your server here: [**Invite Link**](https://discord.ly/sabaac-droid)
-
-Experience the thrill of Sabacc as seen in _Solo: A Star Wars Story_, _Star Wars Outlaws_, and _Star Wars: Rebels_.
-
-Created on **November 14, 2024**.
+Created by Abubakr Elmallah on **June 18, 2025**.
 
 ---
 
-## Features
+## Features (Planned)
 
-### Console Version (Corellian Spike Sabacc)
-
-- **Prototype of Sabacc Droid**: View the original prototype before Sabacc Droid existed.
-- **Classic Gameplay**: Play the Corellian Spike variant against a computer opponent.
-- **Simple Interface**: Enjoy a text-based interface that's easy to navigate.
-
-### Discord Bot Version (All Four Variants)
-
-- **Multiplayer Support**: Play with up to 8 players on a Discord server.
-- **Interactive Gameplay**: Use buttons and embeds for seamless interaction.
-- **Automated Game Management**: The bot handles turn order, card dealing, and scoring.
-- **Game Variants**:  
-  - **[Corellian Spike Sabacc](https://starwars.fandom.com/wiki/Corellian_Spike)** – Featured in *Solo: A Star Wars Story* and *Galaxy’s Edge*, this is a fast-paced version of Sabacc with three rounds and a target hand sum of **zero**.
-  - **[Coruscant Shift Sabacc](https://starwars.fandom.com/wiki/Coruscant_Shift)** – Played on the **Halcyon** at *Galactic Starcruiser*, this variant uses dice mechanics to set the winning hand target.
-  - **[Kessel Sabacc](https://starwars.fandom.com/wiki/Kessel_Sabacc)** – Featured in *Star Wars Outlaws*, this mode includes unique **Impostor** and **Sylop** cards with special mechanics.
-  - **[Traditional Sabacc](https://starwars.fandom.com/wiki/Sabacc)** – Featured in *Star Wars: Rebels*, including a high-stakes game aiming for a total of **+23 or -23**.
-- **Rulebook Access**: View game rules directly in Discord for all variants.
-- **Add the Bot to Your Server**: [Invite Link](https://discord.ly/sabaac-droid)
+* **Text Translation**: Convert English to Aurebesh and back.
+* **Image Output**: Return translation as stylized text or image.
+* **Mini-Games** (Future): Guess-the-word in Aurebesh.
+* **Lore Integration** (Future): Pull data from in-universe planets, ships, or characters.
+* **Bot Personality**: Replies like a Star Wars droid.
 
 ---
 
@@ -40,75 +22,42 @@ Created on **November 14, 2024**.
 
 ### Console Version
 
-1. **Install Python 3.12 or Higher**: Ensure you have Python 3.12+ installed on your system (earlier versions may work but are not tested).
+1. **Install CMake & a C++20-Compatible Compiler**
+   Make sure you have a C++20-compatible compiler (like AppleClang or g++) and [CMake](https://cmake.org/) installed.
+   On macOS with Homebrew:
 
-2. **Run the Game**:
-    ```bash
-    python sabacc_console.py
-    ```
+   ```bash
+   brew install cmake
+   ```
 
-### Discord Bot Version
+2. **Clone and Build the Project**:
 
-- **Add the Bot to Your Server**: [Invite Link](https://discord.ly/sabaac-droid)
-- If you want to make your own Discord Sabacc bot, watch this video: https://www.youtube.com/watch?v=UYJDKSah-Ww&t=330s, then replace the `.py` files you created with the modules in `src`.
+   ```bash
+   git clone https://github.com/yourusername/aurebesh-droid.git
+   cd aurebesh-droid
+   mkdir build && cd build
+   cmake ..
+   cmake --build . --parallel
+   ```
 
----
+3. **Create a `token.txt` File**
+   In the root of the project (same level as `src`), create a file named `token.txt` and paste your Discord bot token into it:
 
-## Game Rules & Variations
+   ```
+   your-bot-token-goes-here
+   ```
 
-Each mode aims for a hand sum close to its target (0, a dice-determined value, or +23/-23), but they differ in decks and rules.
-For more details on Sabacc rules, card designs, and gameplay resources, visit **[Hyperspace Props](https://hyperspaceprops.com/sabacc-resources/)**.
+4. **Run the Bot**:
 
-### **Default Game Settings:**
-- **Corellian Spike and Kessel Sabacc** each have **3 rounds** and **2 starting cards**.
-- **Coruscant Shift Sabacc** has **2 rounds** and **5 starting cards**.
-- **Traditional Sabacc** has **2 starting cards** and an **unlimited amount** of rounds until someone calls "Alderaan" to end the game.
-
-### **Game Variations**
-
-#### **Corellian Spike Sabacc**
-- **Deck:** 62-card deck (-10 to -1 and +1 to +10, plus 2 Sylops (0 cards)).
-- **Rounds:** 3 rounds.
-- **Actions:** Draw, Discard, Replace, Stand, or Junk.
-- **Winning Target:** Closest to 0.
-- **Special Hands:** Pure Sabacc, Fleet, Yee-Haa, etc.
-
-#### **Coruscant Shift Sabacc**
-- **Deck:** Standard 62-card deck (+1 to +10 and -1 to -10 for suits ●, ▲, ■; plus 2 Sylops (0 cards)).
-- **Dice Mechanics:**
-  - **Gold Die:** Sets target number (-10, +10, -5, 5, 0, 0).
-  - **Silver Die:** Sets target suit (●, ▲, ■) for tie-breakers.
-- **Rounds:** 2 rounds.
-- **Winning Target:** Closest to gold die target.
-- **Tie-Breakers:** Closest to gold die target → most cards of silver die suit → highest positive sum → highest single positive card → sudden death.
-
-#### **Kessel Sabacc**
-- **Deck:** Two separate decks (Sand for positives, Blood for negatives), 22 cards each (44 total), plus Sylops.
-- **Hand Limit:** Exactly **2 cards** (1 positive, 1 negative).
-- **Rounds:** 3 rounds.
-- **Actions:** Draw (then discard to maintain 2 cards), Stand, or Junk.
-- **Winning Target:** Closest to 0.
-- **Special Mechanics:**
-  - **Impostor Cards (Ψ):** Roll dice to assign or modify values.
-  - **Sylop (Ø) Cards:** Mirror the value of the other card in hand.
-  - **Special Hands:** Pure Sabacc, Prime Sabacc, etc.
-
-#### **Traditional Sabacc**
-- **Deck:** 76-card deck (4 suits of 15 cards, plus 16 special cards with unique values).
-- **Hand Limit:** No fixed limit; players can accumulate multiple cards.
-- **Rounds:** No set number of rounds; play continues until someone calls **"Alderaan"**.
-- **Actions:** Draw, Replace, Stand, Junk, or Call "Alderaan".
-- **Winning Target:** Closest to **+23 or -23**.
-- **Special Hands:**
-  - **Idiot’s Array (0, 2, 3)** beats all hands.
-  - **Natural Sabacc (+23/-23)** beats all except Idiot’s Array.
-  - **Fairy Empress (-2, -2, totaling -22)** beats a normal 22 but loses to Sabacc hands.
+   ```bash
+   ./AurebeshDroid
+   ```
 
 ---
 
 ## Privacy & Data
 
-**Sabacc Droid** respects your privacy:
+**Aurebesh Droid** respects your privacy:
 - **No Personal Data Collected** – Only temporary game data is stored.
 - **Secure & Compliant** – Fully adheres to Discord’s Terms of Service and Privacy Policy.
 
