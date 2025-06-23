@@ -15,7 +15,6 @@
 CMakeCache.txt
 CMakeFiles/
 cmake_install.cmake
-Makefile
 
 # Environment files
 .env
