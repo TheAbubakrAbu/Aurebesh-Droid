@@ -1,3 +1,3 @@
 // Procfile
 
-worker: ./build/AurebeshDroid
+worker: ./AurebeshDroid

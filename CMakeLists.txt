@@ -25,9 +25,9 @@ if(EXISTS "${CMAKE_SOURCE_DIR}/.env")
 endif()
 
 find_package(OpenSSL REQUIRED)
-find_package(dpp CONFIG REQUIRED)
+add_subdirectory(extern/DPP) 
 
-target_link_libraries(AurebeshDroid PRIVATE dpp::dpp OpenSSL::SSL OpenSSL::Crypto)
+target_link_libraries(AurebeshDroid PRIVATE dpp OpenSSL::SSL OpenSSL::Crypto)
 
 if(APPLE)
     set_target_properties(AurebeshDroid PROPERTIES
