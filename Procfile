@@ -1,1 +1,3 @@
-worker: bash -c "cd build && ./AurebeshDroid"
+// Procfile
+
+worker: ./build/AurebeshDroid
