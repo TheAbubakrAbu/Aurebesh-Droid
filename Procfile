@@ -1,1 +1,1 @@
-worker: ./AurebeshDroid
+worker: bash -c "cd build && ./AurebeshDroid"
