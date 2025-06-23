@@ -7,6 +7,7 @@ all: AurebeshDroid
 AurebeshDroid: $(wildcard src/*.cpp) aurebesh.hpp
 	$(CXX) $(CXXFLAGS) -I/usr/local/include -Iextern/cpp-dotenv/include \
     src/*.cpp -o AurebeshDroid $(LDFLAGS)
+	chmod +x AurebeshDroid
 
 run: AurebeshDroid
 	./AurebeshDroid
