@@ -1,3 +1,3 @@
 // Procfile
 
-worker: bash -c 'make && ./AurebeshDroid'
+worker: ./aurebesh-droid

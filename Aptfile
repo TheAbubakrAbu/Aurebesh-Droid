@@ -1,6 +1,8 @@
-cmake
-make
-build-essential
 libssl-dev
 zlib1g-dev
+
 libsodium-dev
+libopus-dev
+
+pkg-config
+cmake
