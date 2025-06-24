@@ -1,5 +1,7 @@
 # Makefile
 
+$(info ✅ MAKEFILE WAS EXECUTED)
+
 CXX = g++
 CXXFLAGS = -std=c++17 -O2
 SRC_DIR = src
