@@ -1,17 +1,18 @@
 # Makefile
 
-$(info ✅ MAKEFILE WAS EXECUTED)
+$(info ✅ MAKEFILE RAN ✅)
 
 CXX = g++
-CXXFLAGS = -std=c++17 -O2
 SRC_DIR = src
 SRC_FILES = $(wildcard $(SRC_DIR)/*.cpp)
 OUT = aurebesh-droid
 
-DPP_FLAGS = $(shell pkg-config --cflags --libs dpp 2>/dev/null || echo "-ldpp -lpthread -lssl -lcrypto -lcurl")
+CXXFLAGS ?= -std=c++17 -O2 -I/opt/homebrew/opt/openssl/include
+LDFLAGS ?= -L/opt/homebrew/opt/openssl/lib -ldpp -lpthread -lssl -lcrypto -lcurl
 
 all:
-	$(CXX) $(CXXFLAGS) -o $(OUT) $(SRC_FILES) $(DPP_FLAGS)
+	echo "🛠️ Building: $(SRC_FILES)"
+	$(CXX) $(CXXFLAGS) -o $(OUT) $(SRC_FILES) $(LDFLAGS)
 
 clean:
 	rm -f $(OUT)
