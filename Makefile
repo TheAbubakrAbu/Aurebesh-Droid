@@ -1,21 +1,10 @@
 # Makefile
 
-CXX       := g++
-CXXFLAGS  := -std=c++20 -O2 -Wall -Wextra -pedantic \
-             -I./include
-LDFLAGS   := -lpthread -lssl -lcrypto
+CXX = g++
+CXXFLAGS = -std=c++17 -O2
+SRC_DIR = src
+SRC_FILES = $(wildcard $(SRC_DIR)/*.cpp)
+OUT = aurebesh-droid
 
-SRC := $(wildcard src/*.cpp)
-OBJ := $(SRC:.cpp=.o)
-BIN := aurebesh-droid
-
-all: $(BIN)
-
-$(BIN): $(OBJ)
-	$(CXX) $(OBJ) $(LDFLAGS) -o $@
-
-%.o: %.cpp
-	$(CXX) $(CXXFLAGS) -c $< -o $@
-
-clean:
-	rm -f $(OBJ) $(BIN)
+all:
+	$(CXX) $(CXXFLAGS) -o $(OUT) $(SRC_FILES) $(shell pkg-config --cflags --libs dpp)
