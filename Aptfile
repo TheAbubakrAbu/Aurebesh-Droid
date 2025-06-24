@@ -6,3 +6,4 @@ zlib1g-dev
 libwebsocketpp-dev
 libboost-system-dev
 libboost-thread-dev
+pkg-config
