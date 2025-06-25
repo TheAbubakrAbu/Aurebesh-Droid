@@ -11,13 +11,17 @@
 #include <fstream>
 #include <vector>
 #include <cctype>
+#include <filesystem>
 
-bool renderTextToImage(const char* inputText, int fontSize = 96, int imageWidth = 800, int imageHeight = 200) {
-    const char* fontPath = "../fonts/Aurebesh.otf";
-    const char* outputPath = "aurebesh_text.png";
+namespace fs = std::filesystem;
+
+bool renderTextToImage(const char* inputText, std::string& outPath, int fontSize = 96, int imageWidth = 800, int imageHeight = 200) {
+    fs::path fontPath = fs::path(__FILE__).parent_path().parent_path() / "fonts" / "Aurebesh.otf";
+    fs::path outputPath = fs::path(__FILE__).parent_path().parent_path() / "aurebesh_text.png";
+outPath = outputPath.string();
 
     std::ifstream fontFile(fontPath, std::ios::binary | std::ios::ate);
-    if (!fontFile) {
+    if(!fontFile) {
         std::cerr << "❌ Failed to open font file: " << fontPath << '\n';
         return false;
     }
@@ -28,7 +32,7 @@ bool renderTextToImage(const char* inputText, int fontSize = 96, int imageWidth 
     fontFile.read(reinterpret_cast<char*>(fontBuffer.data()), fontSizeBytes);
 
     stbtt_fontinfo font;
-    if (!stbtt_InitFont(&font, fontBuffer.data(), 0)) {
+    if(!stbtt_InitFont(&font, fontBuffer.data(), 0)) {
         std::cerr << "❌ Failed to initialize font.\n";
         return false;
     }
@@ -41,7 +45,7 @@ bool renderTextToImage(const char* inputText, int fontSize = 96, int imageWidth 
     std::vector<unsigned char> image(imageWidth * imageHeight, 255); // white background
     int x = 50;
 
-    for (const char* p = inputText; *p; ++p) {
+    for(const char* p = inputText; *p; ++p) {
         char ch = std::tolower(*p);
 
         int ax, lsb;
@@ -52,22 +56,22 @@ bool renderTextToImage(const char* inputText, int fontSize = 96, int imageWidth 
 
         int y = static_cast<int>(ascent - cy2);
 
-        std::vector<unsigned char> charBitmap((cx2 - cx1) * (cy2 - cy1));
+        std::vector<unsigned char> charBitmap((cx2 - cx1) *(cy2 - cy1));
         stbtt_MakeCodepointBitmap(&font, charBitmap.data(), cx2 - cx1, cy2 - cy1, cx2 - cx1, scale, scale, ch);
 
-        for (int by = 0; by < cy2 - cy1; ++by) {
-            for (int bx = 0; bx < cx2 - cx1; ++bx) {
+        for(int by = 0; by < cy2 - cy1; ++by) {
+            for(int bx = 0; bx < cx2 - cx1; ++bx) {
                 int dst_x = x + bx;
                 int dst_y = y + by;
-                if (dst_x < 0 || dst_x >= imageWidth || dst_y < 0 || dst_y >= imageHeight) continue;
-                image[dst_y * imageWidth + dst_x] = 255 - charBitmap[by * (cx2 - cx1) + bx];
+                if(dst_x < 0 || dst_x >= imageWidth || dst_y < 0 || dst_y >= imageHeight) continue;
+                image[dst_y * imageWidth + dst_x] = 255 - charBitmap[by *(cx2 - cx1) + bx];
             }
         }
 
         x += static_cast<int>(ax * scale);
     }
 
-    if (!stbi_write_png(outputPath, imageWidth, imageHeight, 1, image.data(), imageWidth)) {
+    if (!stbi_write_png(outPath.c_str(), imageWidth, imageHeight, 1, image.data(), imageWidth)) {
         std::cerr << "❌ Failed to save image.\n";
         return false;
     }
