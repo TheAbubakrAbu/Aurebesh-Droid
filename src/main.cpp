@@ -47,7 +47,9 @@ int main() {
             dpp::embed embed = dpp::embed()
                 .set_title("Aurebesh Alphabet")
                 .set_description(getAurebeshList())
-                .set_color(0x2A2E4B);
+                .set_color(0x00CFFF)
+                .set_thumbnail("https://raw.githubusercontent.com/TheAbubakrAbu/Aurebesh-Droid/main/src/images/aurebesh.png");
+
 
             event.reply(dpp::message().add_embed(embed));
         }
