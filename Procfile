@@ -1,3 +1,0 @@
-// Procfile
-
-worker: ./aurebesh-droid
