@@ -1,4 +1,6 @@
 #!/bin/bash
+# run-release.sh
+
 # Builds and runs in release mode using CMake presets
 # To build and run Aurebesh Droid:
 #   chmod +x run-dev.sh run-release.sh
