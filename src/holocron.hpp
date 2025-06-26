@@ -5,35 +5,43 @@
 #include <string>
 #include <vector>
 
-bool contains(const std::string& text1, const std::string& text2) {
-    return text1.find(text2) != std::string::npos;
+using namespace std;
+
+bool contains(const string& text1, const string& text2) {
+    return text1.find(text2) != string::npos;
 }
 
 struct HolocronInfo {
-    std::string title;
+    string title;
     uint32_t color;
-    std::string book;
-    std::string image;
+    string book;
+    string image;
 };
 
-HolocronInfo get_holocron_metadata(const std::string& author, const std::string& command) {
-    std::string image = "https://raw.githubusercontent.com/TheAbubakrAbu/Aurebesh-Droid/main/src/images/aurebesh.png";
+HolocronInfo get_holocron_metadata(const string& author, const string& command) {
+    string blue = "https://raw.githubusercontent.com/TheAbubakrAbu/Aurebesh-Droid/main/src/assets/images/aurebesh.png";
+    string green = "https://raw.githubusercontent.com/TheAbubakrAbu/Aurebesh-Droid/main/src/assets/images/green.png";
+    string yellow = "https://raw.githubusercontent.com/TheAbubakrAbu/Aurebesh-Droid/main/src/assets/images/yellow.png";
+    string purple = "https://raw.githubusercontent.com/TheAbubakrAbu/Aurebesh-Droid/main/src/assets/images/purple.png";
+    //string red = "https://raw.githubusercontent.com/TheAbubakrAbu/Aurebesh-Droid/main/src/assets/images/red.png";
+    string bendu = "https://static.wikia.nocookie.net/starwars/images/3/34/Bendu.png/revision/latest?cb=20230312180517";
+
     if (author == "Bendu") {
-        return { "🔸 Bendu's Wisdom 🔸", 0xDAA520, "📙", image };
+        return { "🔸 Bendu's Wisdom 🔸", 0xDAA520, "📙", bendu };
     } else if(contains(command, "sith") || contains(author, "Darth") || contains(author, "Count")) {
-        return { "🔺 Sith Holocron 🔺", 0x8B0000, "📕", image };
+        return { "🔺 Sith Holocron 🔺", 0x8B0000, "📕", blue };
     } else if(contains(author, "Luke") || contains(author, "Qui") || contains(author, "Yoda")) {
-        return { "💠 Jedi Holocron 💠", 0x228B22, "📗", image };
+        return { "💠 Jedi Holocron 💠", 0x228B22, "📗", green };
     } else if (contains(author, "Mace")) {
-        return { "💠 Jedi Holocron 💠", 0x800080, "📘📕", image };
+        return { "💠 Jedi Holocron 💠", 0x800080, "📘📕", purple };
     } else if (contains(author, "Temple")) {
-        return { "💠 Jedi Holocron 💠", 0xFFD700, "📒", image };
+        return { "💠 Jedi Holocron 💠", 0xFFD700, "📒", yellow };
     } else {
-        return { "💠 Jedi Holocron 💠", 0x4295E2, "📘", image };
+        return { "💠 Jedi Holocron 💠", 0x4295E2, "📘", blue };
     }
 }
 
-std::vector<std::pair<std::string, std::string>> jedi_quotes = {
+vector<pair<string, string>> jedi_quotes = {
     // Prequel Jedi Quotes
     { "Yoda", "Fear is the path to the dark side. Fear leads to anger. Anger leads to hate. Hate leads to suffering." },
     { "Yoda", "Train yourself to let go of everything you fear to lose." },
@@ -159,7 +167,7 @@ std::vector<std::pair<std::string, std::string>> jedi_quotes = {
     { "Cal Kestis", "I still believe in what the Jedi stood for." },
 };
 
-std::vector<std::pair<std::string, std::string>> sith_quotes = {
+vector<pair<string, string>> sith_quotes = {
     // Prequels Sith Quotes
     { "Darth Sidious", "The dark side of the Force is a pathway to many abilities some consider to be unnatural." },
     { "Darth Sidious", "There is only one truth, Anakin—me." },

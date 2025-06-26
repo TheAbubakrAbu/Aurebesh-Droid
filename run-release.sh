@@ -7,6 +7,7 @@
 #   ./run-dev.sh      # builds and runs in Debug mode
 #   ./run-release.sh  # builds and runs in Release mode
 
+killall AurebeshDroid
 echo "🚀 Building in RELEASE mode..."
 
 BUILD_DIR=~/Downloads/aurebesh-droid-release

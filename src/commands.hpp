@@ -13,7 +13,7 @@
 
 using namespace std;
 
-const string thumbnail = "https://raw.githubusercontent.com/TheAbubakrAbu/Aurebesh-Droid/main/src/images/aurebesh.png";
+const string thumbnail = "https://raw.githubusercontent.com/TheAbubakrAbu/Aurebesh-Droid/main/src/assets/images/aurebesh.png";
 const auto color = 0x4295E2;
 
 inline void alphabetCommand(const dpp::slashcommand_t& event) {
@@ -51,7 +51,14 @@ inline void helpCommand(const dpp::slashcommand_t& event) {
         "• **[Aurebesh Translator](https://apps.apple.com/us/app/aurebesh-translator/id6670201513?platform=iphone)** – A lightweight, offline, distraction-free translator.\n\n"
 
         "### **Credits**\n"
-        "• **Font:** Aurebesh.otf by [Pixel Sagas](https://www.fonts4free.net/aurebesh-font.html)\n"
+        "• **Fonts:**\n"
+        "    • [Standard Aurebesh](https://www.fonts4free.net/aurebesh-font.html) by Pixel Sagas\n"
+        "    • [Cantina Aurebesh](https://www.fontspace.com/aurebesh-cantina-font-f22020) by Pixel Sagas\n"
+        "    • [Droid Aurebesh](https://www.fontspace.com/droidobesh-depot-font-f55049) by AurekFonts\n"
+        "    • [Mando'a Fonts](http://www.erikstormtrooper.com/mandalorian.htm) by Erikstormtrooper\n"
+        "    • [Outer Rim](https://www.fontspace.com/outer-rim-af-font-f49641) by AurekFonts\n"
+        "    • [Sith Font](https://www.fontspace.com/sith-af-font-f49639) by AurekFonts\n"
+        "\n"
         "• **Rendering Engine:** stb_truetype & stb_image_write by [Sean Barrett](https://github.com/nothings/stb)\n"
         "• **Bot Framework:** D++ (DPP) C++ Library by [brainbox](https://github.com/brainboxdotcc/DPP)\n\n"
         "• All other creative content is fan-made and not affiliated with or endorsed by Lucasfilm/Disney.\n\n"
@@ -108,9 +115,10 @@ inline void translateCommand(const dpp::slashcommand_t& event) {
     }).detach();
 }
 
-inline string holocronCommand(const dpp::slashcommand_t& event, string command) {
-    vector<pair<string, string>> quotes =
-        (contains(command, "sith")) ? sith_quotes : jedi_quotes;
+inline void holocronCommand(const dpp::slashcommand_t& event, string command) {
+    vector<pair<string, string>> quotes = (contains(command, "sith")) ? sith_quotes : jedi_quotes;
+
+    if(command == "holocron") quotes.insert(quotes.end(), sith_quotes.begin(), sith_quotes.end());
 
     quotes.insert(quotes.end(), {
         { "Bendu", "I am the Bendu, the one in the middle. Between the light and the dark." },
