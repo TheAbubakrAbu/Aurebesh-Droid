@@ -1,19 +1,39 @@
+// commands.hpp
+
 #pragma once
 
-#include <string>
-#include "aurebesh.hpp"
+#include <iostream>
+#include <random>
 
-inline std::string getAurebeshList() {
-    std::string text;
+#include <dpp/dpp.h>
+
+#include "aurebesh.hpp"
+#include "holocron.hpp"
+#include "render_aurebesh/render_aurebesh.hpp"
+
+using namespace std;
+
+const string thumbnail = "https://raw.githubusercontent.com/TheAbubakrAbu/Aurebesh-Droid/main/src/images/aurebesh.png";
+const auto color = 0x4295E2;
+
+inline void alphabetCommand(const dpp::slashcommand_t& event) {
+    string description;
     for (int i = 0; i < aurebeshSize; ++i) {
         const AurebeshLetter& letter = aurebeshLetters[i];
-        text += "`" + letter.letter + "` → **" + letter.aurebeshName + "**\n";
+        description += "`" + letter.letter + "` → **" + letter.aurebeshName + "**\n";
     }
-    return text;
+    
+    dpp::embed embed = dpp::embed()
+        .set_title("Aurebesh Alphabet")
+        .set_description(description)
+        .set_color(color)
+        .set_thumbnail(thumbnail);
+
+    event.reply(dpp::message().add_embed(embed));
 }
 
-inline std::string getAurebeshHelp() {
-    return
+inline void helpCommand(const dpp::slashcommand_t& event) {
+    string description = (
         "### **Welcome to Aurebesh Droid**\n"
         "This bot translates Galactic Basic (English) into the **Aurebesh script** used throughout the Star Wars galaxy.\n\n"
 
@@ -38,5 +58,80 @@ inline std::string getAurebeshHelp() {
 
         "Created by **[Abubakr Elmallah](https://abubakrelmallah.com)**\n\n"
         "[📂 GitHub Repository](https://github.com/TheAbubakrAbu/Aurebesh-Droid)\n\n"
-        "May the Force be with you!";
+        "May the Force be with you!"
+    );
+
+    dpp::embed embed = dpp::embed()
+        .set_title("Aurebesh Droid Help")
+        .set_description(description)
+        .set_color(color)
+        .set_thumbnail(thumbnail);
+
+    event.reply(dpp::message().add_embed(embed));
+}
+
+inline void translateCommand(const dpp::slashcommand_t& event) {
+    const string input = get<string>(event.get_parameter("text"));
+    if (input.empty() || input.size() > 50) {
+        event.reply("❌ Please enter between 1 and 50 characters.");
+        return;
+    }
+
+    event.thinking();
+
+    thread([event, input]() mutable {
+        ostringstream oss;
+        oss << "aurebesh_" << event.command.usr.id << '_' << event.command.channel_id << '_' << chrono::duration_cast<chrono::milliseconds>(chrono::system_clock::now().time_since_epoch()).count()<< ".png";
+
+        const string imgName = oss.str();
+
+        string imgPath;
+        if (!renderTextToImage(input.c_str(), imgPath, imgName)) {
+            event.edit_response("❌ Failed to render Aurebesh image.");
+            return;
+        }
+
+        const string description = "<@" + to_string(event.command.usr.id) + "> said:\n" + input;
+
+        dpp::embed embed = dpp::embed()
+            .set_title("Aurebesh Translation")
+            .set_description(description)
+            .set_color(color)
+            .set_thumbnail(thumbnail)
+            .set_image("attachment://" + imgName);
+
+        dpp::message msg;
+        msg.add_embed(embed).add_file(imgName, dpp::utility::read_file(imgPath));
+
+        event.edit_response(msg);
+        remove(imgPath.c_str());
+    }).detach();
+}
+
+inline string holocronCommand(const dpp::slashcommand_t& event, string command) {
+    vector<pair<string, string>> quotes =
+        (contains(command, "sith")) ? sith_quotes : jedi_quotes;
+
+    quotes.insert(quotes.end(), {
+        { "Bendu", "I am the Bendu, the one in the middle. Between the light and the dark." },
+        { "Bendu", "An object cannot make you good or evil. The temptation of power is always there, but those who are strong enough to control it are the ones who truly have the power." },
+        { "Bendu", "You think the only way to gain power is by embracing the dark side. Wrong." },
+        { "Bendu", "You do not comprehend what it is I am. And what I can do!" },
+        { "Bendu", "I am beyond your understanding." }
+    });
+
+    random_device rd;
+    mt19937 gen(rd());
+    uniform_int_distribution<> dis(0, quotes.size() - 1);
+    auto& [author, quote] = quotes[dis(gen)];
+
+    HolocronInfo meta = get_holocron_metadata(author, command);
+
+    dpp::embed embed = dpp::embed()
+        .set_title(meta.title)
+        .set_description("\"" + quote + "\"\n\n— **" + author + " " + meta.book + "**")
+        .set_color(meta.color)
+        .set_thumbnail(meta.image);
+
+    event.reply(dpp::message().add_embed(embed));
 }
