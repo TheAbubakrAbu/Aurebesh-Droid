@@ -3,11 +3,12 @@
 #include <cstdlib>
 #include <iostream>
 #include <fstream>
+#include <random>
 
 #include <dpp/dpp.h>
 
 #include "commands.hpp"
-#include "aurebesh.hpp"
+#include "holocron.hpp"
 #include "render_aurebesh/render_aurebesh.hpp"
 
 using namespace std;
@@ -24,21 +25,29 @@ int main() {
     bot.on_log(dpp::utility::cout_logger());
 
     bot.on_ready([&bot](const dpp::ready_t& event) {
-        dpp::activity playing(dpp::activity_type::at_game, "Jedi Holocron", "", "");
+        dpp::activity playing(dpp::activity_type::at_game, "💠 Jedi Holocron", "", "");
         bot.set_presence(dpp::presence(dpp::ps_online, playing));
 
         cout << "Bot is up: " << bot.me.username << '\n';
 
         if(dpp::run_once<struct register_commands>()) {
             bot.global_command_create(
+                dpp::slashcommand("translate", "Convert English text to Aurebesh", bot.me.id)
+                    .add_option(dpp::command_option(dpp::co_string, "text", "Text to translate", true))
+            );
+
+            bot.global_command_create(
                 dpp::slashcommand("alphabet", "Display the Aurebesh alphabet", bot.me.id)
             );
 
             bot.global_command_create(
-                dpp::slashcommand("translate", "Convert English text to Aurebesh", bot.me.id)
-                    .add_option(dpp::command_option(dpp::co_string, "text", "Text to translate", true))
+                dpp::slashcommand("aurebesh", "Display the Aurebesh alphabet", bot.me.id)
             );
             
+            bot.global_command_create(
+                dpp::slashcommand("holocron", "Use the Force and unlock the secrets of the Jedi or the Sith", bot.me.id)
+            );
+
             bot.global_command_create(
                 dpp::slashcommand("holocron_jedi", "Use the Force and unlock the secrets of the Jedi", bot.me.id)
             );
@@ -56,7 +65,7 @@ int main() {
     bot.on_slashcommand([&bot](const dpp::slashcommand_t& event) {
         const string command = event.command.get_command_name();
 
-        if(command == "alphabet") {
+        if(command == "alphabet" || command == "aurebesh") {
             dpp::embed embed = dpp::embed()
                 .set_title("Aurebesh Alphabet")
                 .set_description(getAurebeshList())
@@ -102,10 +111,82 @@ int main() {
             event.edit_response(msg);
 
             std::remove(imagePath.c_str());
-        } else if(command == "holcron_jedi") {
+        } else if(command.find("holocron") != string::npos) {
+            string title = "💠 Jedi Holocron 💠";
+            vector<pair<string, string>> quotes = jedi_quotes;
+            auto color = 0x4295E2;
+            string book = "📘";
 
-        } else if(command == "holocron_sith") {
+            if(command.find("sith") != string::npos) {
+                title = "🔺 Sith Holocron 🔺";
+                quotes = sith_quotes;
+                color = 0x8B0000;
+                book = "📕";
+            }
 
+            quotes.insert(quotes.end(), {
+                { "Bendu", "I am the Bendu, the one in the middle. Between the light and the dark." },
+                { "Bendu", "An object cannot make you good or evil. The temptation of power is always there, but those who are strong enough to control it are the ones who truly have the power." },
+                { "Bendu", "You think the only way to gain power is by embracing the dark side. Wrong." },
+                { "Bendu", "You do not comprehend what it is I am. And what I can do!" },
+                { "Bendu", "I am beyond your understanding." },
+            });
+
+            std::random_device rd;
+            std::mt19937 gen(rd());
+            std::uniform_int_distribution<> dis(0, quotes.size() - 1);
+            auto& [author, quote] = quotes[dis(gen)];
+
+            if(author == "Bendu") {
+                color = 0xDAA520;
+                book = "📙";
+                title += " | 🔸 Bendu's Wisdom 🔸";
+            }
+
+            dpp::embed embed = dpp::embed()
+                .set_title(title)
+                .set_description("\"" + quote + "\"\n\n— **" + author + " " + book + "**")
+                .set_color(color)
+                .set_thumbnail("https://raw.githubusercontent.com/TheAbubakrAbu/Aurebesh-Droid/main/src/images/aurebesh.png");
+
+            event.reply(dpp::message().add_embed(embed));
+        } else if(command == "holocron") {
+            vector<pair<string, string>> quotes = jedi_quotes;
+            quotes.insert(quotes.end(), sith_quotes.begin(), sith_quotes.end());
+            quotes.insert(quotes.end(), {
+                { "Bendu", "I am the Bendu, the one in the middle. Between the light and the dark." },
+                { "Bendu", "An object cannot make you good or evil. The temptation of power is always there, but those who are strong enough to control it are the ones who truly have the power." },
+                { "Bendu", "You think the only way to gain power is by embracing the dark side. Wrong." },
+                { "Bendu", "You do not comprehend what it is I am. And what I can do!" },
+                { "Bendu", "I am beyond your understanding." },
+            });
+
+            string title = "💠 Jedi Holocron 💠";
+            auto color = 0x4295E2;
+            string book = "📘";
+
+            std::random_device rd;
+            std::mt19937 gen(rd());
+            std::uniform_int_distribution<> dis(0, quotes.size() - 1);
+            auto& [author, quote] = quotes[dis(gen)];
+
+            if(author == "Bendu") {
+                title = "🔸 Bendu's Wisdom 🔸";
+                color = 0xDAA520;
+                book = "📙";
+            } else if(author.find("Darth") != string::npos || author.find("Count") != string::npos) {
+                title = "🔺 Sith Holocron 🔺";
+                color = 0x8B0000;
+                book = "📕";
+            }
+
+            dpp::embed embed = dpp::embed()
+                .set_title(title)
+                .set_description("\"" + quote + "\"\n\n— **" + author + " " + book + "**")
+                .set_color(color)
+                .set_thumbnail("https://raw.githubusercontent.com/TheAbubakrAbu/Aurebesh-Droid/main/src/images/aurebesh.png");
+
+            event.reply(dpp::message().add_embed(embed));
         } else if(command == "help") {
             dpp::embed embed = dpp::embed()
                 .set_title("Aurebesh Droid Help")
