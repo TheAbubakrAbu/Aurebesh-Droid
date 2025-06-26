@@ -15,10 +15,10 @@
 
 namespace fs = std::filesystem;
 
-bool renderTextToImage(const char* inputText, std::string& outPath, int fontSize = 96, int imageWidth = 800, int imageHeight = 200) {
+bool renderTextToImage(const char* inputText, std::string& outPath, const std::string& imageName, int fontSize = 96, int imageWidth = 800, int imageHeight = 200) {
     fs::path fontPath = fs::path(__FILE__).parent_path().parent_path() / "fonts" / "Aurebesh.otf";
-    fs::path outputPath = fs::path(__FILE__).parent_path().parent_path() / "aurebesh_text.png";
-outPath = outputPath.string();
+    fs::path outputPath = fs::path(__FILE__).parent_path().parent_path() / imageName;
+    outPath = outputPath.string();
 
     std::ifstream fontFile(fontPath, std::ios::binary | std::ios::ate);
     if(!fontFile) {
