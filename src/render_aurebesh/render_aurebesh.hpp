@@ -15,27 +15,28 @@
 #include <cctype>
 #include <filesystem>
 
-namespace fs = std::filesystem;
+using namespace std;
+namespace fs = filesystem;
 
-inline bool renderTextToImage(const char* inputText, std::string& outPath, const std::string& imageName, int fontSize = 96, int imageWidth = 800, int imageHeight = 200) {
-    fs::path fontPath = fs::path(__FILE__).parent_path().parent_path() / "assets" / "fonts" / "StandardAurebesh.otf";
+inline bool renderTextToImage(const char* inputText, string& outPath, const string& imageName, const string& fontFile, int fontSize = 96, int imageWidth = 800, int imageHeight = 200) {
+    fs::path fontPath = fs::path(__FILE__).parent_path().parent_path() / "assets" / "fonts" / fontFile;
     fs::path outputPath = fs::path(__FILE__).parent_path().parent_path() / imageName;
     outPath = outputPath.string();
 
-    std::ifstream fontFile(fontPath, std::ios::binary | std::ios::ate);
+    ifstream fontFile(fontPath, ios::binary | ios::ate);
     if(!fontFile) {
-        std::cerr << "❌ Failed to open font file: " << fontPath << '\n';
+        cerr << "❌ Failed to open font file: " << fontPath << '\n';
         return false;
     }
 
-    std::streamsize fontSizeBytes = fontFile.tellg();
-    fontFile.seekg(0, std::ios::beg);
-    std::vector<unsigned char> fontBuffer(fontSizeBytes);
+    streamsize fontSizeBytes = fontFile.tellg();
+    fontFile.seekg(0, ios::beg);
+    vector<unsigned char> fontBuffer(fontSizeBytes);
     fontFile.read(reinterpret_cast<char*>(fontBuffer.data()), fontSizeBytes);
 
     stbtt_fontinfo font;
     if(!stbtt_InitFont(&font, fontBuffer.data(), 0)) {
-        std::cerr << "❌ Failed to initialize font.\n";
+        cerr << "❌ Failed to initialize font.\n";
         return false;
     }
 
@@ -44,11 +45,11 @@ inline bool renderTextToImage(const char* inputText, std::string& outPath, const
     stbtt_GetFontVMetrics(&font, &ascent, &descent, &lineGap);
     ascent *= scale;
 
-    std::vector<unsigned char> image(imageWidth * imageHeight, 255);
+    vector<unsigned char> image(imageWidth * imageHeight, 255);
     int x = 50;
 
     for(const char* p = inputText; *p; ++p) {
-        char ch = std::tolower(*p);
+        char ch = tolower(*p);
 
         int ax, lsb;
         stbtt_GetCodepointHMetrics(&font, ch, &ax, &lsb);
@@ -58,7 +59,7 @@ inline bool renderTextToImage(const char* inputText, std::string& outPath, const
 
         int y = static_cast<int>(ascent - cy2);
 
-        std::vector<unsigned char> charBitmap((cx2 - cx1) *(cy2 - cy1));
+        vector<unsigned char> charBitmap((cx2 - cx1) *(cy2 - cy1));
         stbtt_MakeCodepointBitmap(&font, charBitmap.data(), cx2 - cx1, cy2 - cy1, cx2 - cx1, scale, scale, ch);
 
         for(int by = 0; by < cy2 - cy1; ++by) {
@@ -74,10 +75,10 @@ inline bool renderTextToImage(const char* inputText, std::string& outPath, const
     }
 
     if (!stbi_write_png(outPath.c_str(), imageWidth, imageHeight, 1, image.data(), imageWidth)) {
-        std::cerr << "❌ Failed to save image.\n";
+        cerr << "❌ Failed to save image.\n";
         return false;
     }
 
-    std::cout << "✅ Rendered image saved to " << outputPath << '\n';
+    cout << "✅ Rendered image saved to " << outputPath << '\n';
     return true;
 }

@@ -93,7 +93,7 @@ inline void translateCommand(const dpp::slashcommand_t& event) {
         const string imgName = oss.str();
 
         string imgPath;
-        if (!renderTextToImage(input.c_str(), imgPath, imgName)) {
+        if (!renderTextToImage(input.c_str(), imgPath, imgName, "StandardAurebesh.otf")) {
             event.edit_response("❌ Failed to render Aurebesh image.");
             return;
         }
