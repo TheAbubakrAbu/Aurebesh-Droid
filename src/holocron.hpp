@@ -1,7 +1,37 @@
+// holocron.hpp
+
 #pragma once
 
 #include <string>
 #include <vector>
+
+bool contains(const std::string& text1, const std::string& text2) {
+    return text1.find(text2) != std::string::npos;
+}
+
+struct HolocronInfo {
+    std::string title;
+    uint32_t color;
+    std::string book;
+    std::string image;
+};
+
+HolocronInfo get_holocron_metadata(const std::string& author, const std::string& command) {
+    std::string image = "https://raw.githubusercontent.com/TheAbubakrAbu/Aurebesh-Droid/main/src/images/aurebesh.png";
+    if (author == "Bendu") {
+        return { "🔸 Bendu's Wisdom 🔸", 0xDAA520, "📙", image };
+    } else if(contains(command, "sith") || contains(author, "Darth") || contains(author, "Count")) {
+        return { "🔺 Sith Holocron 🔺", 0x8B0000, "📕", image };
+    } else if(contains(author, "Luke") || contains(author, "Qui") || contains(author, "Yoda")) {
+        return { "💠 Jedi Holocron 💠", 0x228B22, "📗", image };
+    } else if (contains(author, "Mace")) {
+        return { "💠 Jedi Holocron 💠", 0x800080, "📘📕", image };
+    } else if (contains(author, "Temple")) {
+        return { "💠 Jedi Holocron 💠", 0xFFD700, "📒", image };
+    } else {
+        return { "💠 Jedi Holocron 💠", 0x4295E2, "📘", image };
+    }
+}
 
 std::vector<std::pair<std::string, std::string>> jedi_quotes = {
     // Prequel Jedi Quotes
@@ -48,22 +78,23 @@ std::vector<std::pair<std::string, std::string>> jedi_quotes = {
     { "Qui-Gon Jinn", "He is the Chosen One. He will bring balance." },
     { "Qui-Gon Jinn", "Balance is not letting your emotions control you." },
 
-    { "Anakin Skywalker", "From my point of view, the Jedi are evil!" },
-    { "Anakin Skywalker", "If you're not with me, then you're my enemy." },
+    { "Anakin Skywalker", "The biggest problem in the universe is that nobody helps each other." },
     { "Anakin Skywalker", "I’m a Jedi. I know I’m better than this." },
-    { "Anakin Skywalker", "I killed them all. They're dead, every single one of them." },
     { "Anakin Skywalker", "Someday I will be the most powerful Jedi ever!" },
     { "Anakin Skywalker", "I want more. And I know I shouldn't." },
-    { "Anakin Skywalker", "I see through the lies of the Jedi." },
-    { "Anakin Skywalker", "You underestimate my power!" },
     { "Anakin Skywalker", "Sometimes, we must let go of our pride and do what is requested of us." },
     { "Anakin Skywalker", "I'm a Jedi, I know I'm better than this!" },
-    { "Anakin Skywalker", "Obi-Wan, how did you even survive this long?" },
 
     { "Ki-Adi-Mundi", "What about the droid attack on the Wookiees?" },
     { "Ki-Adi-Mundi", "The Sith have been extinct for a millennium." },
 
     { "Plo Koon", "The Force will guide us, as it always has." },
+
+    { "Jedi Temple Guard", "You have made your choice." },
+    { "Jedi Temple Guard", "The Jedi Temple has no place for you." },
+    { "Jedi Temple Guard", "You know what must be done." },
+    { "Jedi Temple Guard", "A Jedi must be willing to face the truth, no matter how painful." },
+    { "Jedi Temple Guard", "The future is not given. You must choose your path." },
 
     // Original Jedi Quotes
     { "Obi-Wan Kenobi", "Use the Force, Luke." },
@@ -71,6 +102,7 @@ std::vector<std::pair<std::string, std::string>> jedi_quotes = {
     { "Obi-Wan Kenobi", "The Force will be with you, always." },
     { "Obi-Wan Kenobi", "This is the weapon of a Jedi Knight. Not as clumsy or random as a blaster; an elegant weapon for a more civilized age." },
     { "Obi-Wan Kenobi", "Mos Eisley spaceport. You will never find a more wretched hive of scum and villainy. We must be cautious." },
+    { "Obi-Wan Kenobi", "Your eyes can deceive you. Don’t trust them." },
     
     { "Luke Skywalker", "I am a Jedi, like my father before me." },
     { "Luke Skywalker", "I'll never turn to the dark side. You've failed, Your Highness." },
@@ -78,16 +110,19 @@ std::vector<std::pair<std::string, std::string>> jedi_quotes = {
     { "Luke Skywalker", "I won't fight you, Father." },
     { "Luke Skywalker", "I have accepted the truth that you were once Anakin Skywalker, my father." },
     { "Luke Skywalker", "Search your feelings, Father. You can't do this. I feel the conflict within you." },
+    { "Luke Skywalker", "Confronting fear is the destiny of the Jedi." },
 
     { "Yoda", "Judge me by my size, do you?" },
     { "Yoda", "You must unlearn what you have learned." },
     { "Yoda", "Luminous beings are we, not this crude matter." },
     { "Yoda", "Wars not make one great." },
+    { "Yoda", "For my ally is the Force. And a powerful ally it is." },
     { "Yoda", "Do or do not. There is no try." },
     { "Yoda", "When you look at the dark side, careful you must be. For the dark side looks back." },
     { "Yoda", "Always in motion is the future." },
     { "Yoda", "A Jedi uses the Force for knowledge and defense, never for attack." },
     { "Yoda", "That is why you fail." },
+    { "Yoda", "The greatest teacher, failure is." },
 
     // Rebels Jedi Quotes
     { "Kanan Jarrus", "I survived one war. I’m not ready for another." },
