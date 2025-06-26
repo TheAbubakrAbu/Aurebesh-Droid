@@ -71,6 +71,6 @@ int main() {
             holocronCommand(event, command);
         }
     });
-
+    
     bot.start(dpp::st_wait);
 }

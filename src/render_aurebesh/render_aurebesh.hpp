@@ -18,7 +18,7 @@
 namespace fs = std::filesystem;
 
 inline bool renderTextToImage(const char* inputText, std::string& outPath, const std::string& imageName, int fontSize = 96, int imageWidth = 800, int imageHeight = 200) {
-    fs::path fontPath = fs::path(__FILE__).parent_path().parent_path() / "fonts" / "Aurebesh.otf";
+    fs::path fontPath = fs::path(__FILE__).parent_path().parent_path() / "assets" / "fonts" / "StandardAurebesh.otf";
     fs::path outputPath = fs::path(__FILE__).parent_path().parent_path() / imageName;
     outPath = outputPath.string();
 
