@@ -39,7 +39,7 @@ inline void helpCommand(const dpp::slashcommand_t& event) {
 
         "### **Commands**\n"
         "• `/alphabet` – View the complete Aurebesh alphabet with English equivalents.\n"
-        "• `/translate <text>` – Convert up to 50 English characters into Aurebesh and receive a rendered image.\n"
+        "• `/translate <text>` – Convert English into Aurebesh and receive a rendered image.\n"
         "• `/help` – Show this help message.\n\n"
 
         "### **Features**\n"
@@ -79,10 +79,10 @@ inline void helpCommand(const dpp::slashcommand_t& event) {
 
 inline void translateCommand(const dpp::slashcommand_t& event) {
     const string input = get<string>(event.get_parameter("text"));
-    if (input.empty() || input.size() > 50) {
-        event.reply("❌ Please enter between 1 and 50 characters.");
+    if (input.empty()) {
+        event.reply("❌ Please enter at least one character.");
         return;
-    }
+    } 
 
     event.thinking();
 
