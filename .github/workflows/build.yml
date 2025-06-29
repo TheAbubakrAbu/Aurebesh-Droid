@@ -13,6 +13,17 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Cache CMake and build
+        uses: actions/cache@v3
+        with:
+          path: |
+            build
+            extern/DPP/build
+            ~/.cmake
+          key: ${{ runner.os }}-aurebesh-droid-${{ hashFiles('**/CMakeLists.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-aurebesh-droid-
+
       - name: Install dependencies
         run: |
           sudo apt update
