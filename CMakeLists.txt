@@ -14,10 +14,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS src/*.cpp)
 include_directories(src)
 
-# Exclude all dotfiles and swap/backup files
-list(FILTER SOURCES EXCLUDE REGEX "/\\..*")          # Excludes .DS_Store, .gitkeep, etc.
-list(FILTER SOURCES EXCLUDE REGEX ".*~$")            # Excludes editor backup files (e.g., file.cpp~)
-list(FILTER SOURCES EXCLUDE REGEX ".*\\.swp$")       # Excludes Vim swap files
+list(FILTER SOURCES EXCLUDE REGEX "/\\..*")
+list(FILTER SOURCES EXCLUDE REGEX ".*~$")
+list(FILTER SOURCES EXCLUDE REGEX ".*\\.swp$")
 
 add_executable(AurebeshDroid ${SOURCES})
 

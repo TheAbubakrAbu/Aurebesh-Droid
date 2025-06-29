@@ -1,22 +1,21 @@
 # Aurebesh Droid - Discord Bot
 
-Aurebesh Droid is a work-in-progress Discord bot that brings the iconic Star Wars writing system, Aurebesh, to life. Inspired by the droids and datapads of the Star Wars universe, this bot is designed to serve as a fun language tool, immersive companion, and experimental platform for new Star Wars features.
+**Aurebesh Droid** is a fully functional Discord bot that brings the iconic Star Wars writing system, **Aurebesh**, to life. Inspired by the droids and datapads of the Star Wars universe, it serves as a language translator, an immersive lore companion, and a platform for Star Wars-inspired features.
+
+The bot includes dynamic **Jedi and Sith holocrons** that unlock hidden wisdom from across the galaxy, adding a rich layer of interactivity and mystery to the experience.
 
 [**Add Aurebesh Droid to Your Server**](https://discord.ly/aurebesh-droid)
 
 Created by **Abubakr Elmallah** on **June 18, 2025**.
 
-## Features (Planned)
+## Features
 
-* **Text Translation**: Convert English to Aurebesh and back.
-* **Image Output**: Return translation as stylized text or image.
-* **Mini-Games** (Future): Guess-the-word in Aurebesh.
-* **Lore Integration** (Future): Pull data from in-universe planets, ships, or characters.
-* **Bot Personality**: Replies like a Star Wars droid.
+- `/translate` — Convert English text to **Aurebesh**.
+- `/aurebesh` or `/alphabet` — View the **Aurebesh alphabet chart**.
+- `/holocron`, `/holocron_jedi`, `/holocron_sith` — Unlock secrets from Jedi and Sith Holocrons with randomized lore quotes.
+- **Image Rendering** — Renders translated text into high-quality PNGs using Aurebesh fonts.
 
 ## Getting Started
-
-### Console Version
 
 1. **Install CMake & a C++20-Compatible Compiler**
    Make sure you have a C++20-compatible compiler (like AppleClang or g++) and [CMake](https://cmake.org/) installed.
@@ -29,24 +28,20 @@ Created by **Abubakr Elmallah** on **June 18, 2025**.
 2. **Clone and Build the Project**:
 
    ```bash
-   git clone https://github.com/yourusername/aurebesh-droid.git
-   cd aurebesh-droid
-   mkdir build && cd build
-   cmake ..
-   cmake --build . --parallel
+   git clone https://github.com/theabubakrabu/aurebesh-droid.git
    ```
 
-3. **Create a `token.txt` File**
-   In the root of the project (same level as `src`), create a file named `token.txt` and paste your Discord bot token into it:
+3. **Create a `.env` File**
+   In the root of the project (same level as `src`), create a file named `.env` and paste your Discord bot token into it:
 
    ```
-   your-bot-token-goes-here
+   DISCORD_TOKEN=token
    ```
 
 4. **Run the Bot**:
 
    ```bash
-   ./AurebeshDroid
+   ./run-dev.sh
    ```
 
 ## Privacy & Data

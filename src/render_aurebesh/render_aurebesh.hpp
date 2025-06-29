@@ -28,7 +28,7 @@ inline bool renderTextToImage(const char* inputText, std::string& outPath, const
     int padding = 40;
 
     std::ifstream fontFile(fontPath, std::ios::binary | std::ios::ate);
-    if (!fontFile) {
+    if(!fontFile) {
         std::cerr << "❌ Failed to open font file: " << fontPath << '\n';
         return false;
     }
@@ -39,7 +39,7 @@ inline bool renderTextToImage(const char* inputText, std::string& outPath, const
     fontFile.read(reinterpret_cast<char*>(fontBuffer.data()), fontSizeBytes);
 
     stbtt_fontinfo font;
-    if (!stbtt_InitFont(&font, fontBuffer.data(), 0)) {
+    if(!stbtt_InitFont(&font, fontBuffer.data(), 0)) {
         std::cerr << "❌ Failed to initialize font.\n";
         return false;
     }
@@ -54,15 +54,15 @@ inline bool renderTextToImage(const char* inputText, std::string& outPath, const
     int currentLineWidth = 0;
     int actualMaxLineWidth = 0;
 
-    for (const char* p = inputText; *p; ++p) {
+    for(const char* p = inputText; *p; ++p) {
         char ch = tolower(*p);
         int ax, lsb;
         stbtt_GetCodepointHMetrics(&font, ch, &ax, &lsb);
         int advance = static_cast<int>(ax * scale);
 
-        if (currentLineWidth + advance > maxLineWidth && !currentLine.empty()) {
+        if(currentLineWidth + advance > maxLineWidth && !currentLine.empty()) {
             lines.push_back(currentLine);
-            if (currentLineWidth > actualMaxLineWidth)
+            if(currentLineWidth > actualMaxLineWidth)
                 actualMaxLineWidth = currentLineWidth;
 
             currentLine.clear();
@@ -73,9 +73,9 @@ inline bool renderTextToImage(const char* inputText, std::string& outPath, const
         currentLineWidth += advance;
     }
 
-    if (!currentLine.empty()) {
+    if(!currentLine.empty()) {
         lines.push_back(currentLine);
-        if (currentLineWidth > actualMaxLineWidth)
+        if(currentLineWidth > actualMaxLineWidth)
             actualMaxLineWidth = currentLineWidth;
     }
 
@@ -83,11 +83,11 @@ inline bool renderTextToImage(const char* inputText, std::string& outPath, const
     int imageHeight = static_cast<int>(lines.size()) * lineHeight + 2 * padding;
     std::vector<unsigned char> image(imageWidth * imageHeight, 255);
 
-    for (int i = 0; i < lines.size(); ++i) {
+    for(int i = 0; i < lines.size(); ++i) {
         int x = padding;
         const std::string& line = lines[i];
 
-        for (char ch : line) {
+        for(char ch : line) {
             ch = tolower(ch);
             int ax, lsb;
             stbtt_GetCodepointHMetrics(&font, ch, &ax, &lsb);
@@ -95,17 +95,17 @@ inline bool renderTextToImage(const char* inputText, std::string& outPath, const
             int cx1, cy1, cx2, cy2;
             stbtt_GetCodepointBitmapBox(&font, ch, scale, scale, &cx1, &cy1, &cx2, &cy2);
 
-            int y = padding + i * lineHeight + (lineHeight - (cy2 - cy1)) / 2;
+            int y = padding + i * lineHeight +(lineHeight -(cy2 - cy1)) / 2;
 
-            std::vector<unsigned char> charBitmap((cx2 - cx1) * (cy2 - cy1));
+            std::vector<unsigned char> charBitmap((cx2 - cx1) *(cy2 - cy1));
             stbtt_MakeCodepointBitmap(&font, charBitmap.data(), cx2 - cx1, cy2 - cy1, cx2 - cx1, scale, scale, ch);
 
-            for (int by = 0; by < cy2 - cy1; ++by) {
-                for (int bx = 0; bx < cx2 - cx1; ++bx) {
+            for(int by = 0; by < cy2 - cy1; ++by) {
+                for(int bx = 0; bx < cx2 - cx1; ++bx) {
                     int dst_x = x + bx;
                     int dst_y = y + by;
-                    if (dst_x < 0 || dst_x >= imageWidth || dst_y < 0 || dst_y >= imageHeight) continue;
-                    image[dst_y * imageWidth + dst_x] = 255 - charBitmap[by * (cx2 - cx1) + bx];
+                    if(dst_x < 0 || dst_x >= imageWidth || dst_y < 0 || dst_y >= imageHeight) continue;
+                    image[dst_y * imageWidth + dst_x] = 255 - charBitmap[by *(cx2 - cx1) + bx];
                 }
             }
 
@@ -113,7 +113,7 @@ inline bool renderTextToImage(const char* inputText, std::string& outPath, const
         }
     }
 
-    if (!stbi_write_png(outPath.c_str(), imageWidth, imageHeight, 1, image.data(), imageWidth)) {
+    if(!stbi_write_png(outPath.c_str(), imageWidth, imageHeight, 1, image.data(), imageWidth)) {
         std::cerr << "❌ Failed to save image.\n";
         return false;
     }

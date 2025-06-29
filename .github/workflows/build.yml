@@ -1,0 +1,30 @@
+name: Build Linux Binary
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install cmake build-essential libssl-dev
+
+      - name: Build Aurebesh Droid
+        run: |
+          mkdir -p build
+          cd build
+          cmake -DCMAKE_BUILD_TYPE=Release ..
+          cmake --build . --target AurebeshDroid
+
+      - name: Upload built bot
+        uses: actions/upload-artifact@v3
+        with:
+          name: aurebesh-droid
+          path: build/AurebeshDroid
