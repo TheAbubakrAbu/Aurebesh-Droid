@@ -1,47 +1,111 @@
-# build.yml
+# .github/workflows/build.yml
 
 name: Build Linux Binary
 
 on:
   push:
-    branches: [main]
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  CMAKE_BUILD_TYPE: Release
+  CCACHE_MAXSIZE: 200M
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  build-dpp:
+    runs-on: ubuntu-24.04
+    outputs:
+      cache-key: ${{ steps.setkey.outputs.key }}
 
     steps:
-      - uses: actions/checkout@v3
-        with:
-          submodules: recursive
+    - name: Checkout repo (shallow, with submodules)
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+        fetch-depth: 1
 
-      - name: Cache dependencies and build outputs
-        uses: actions/cache@v3
-        with:
-          path: |
-            build
-            extern
-            ~/.cmake
-            ~/.cache
-            ~/.ccache
-          key: ${{ runner.os }}-aurebesh-droid-${{ hashFiles('**/CMakeLists.txt', '**/*.cmake', '**/extern/**') }}
-          restore-keys: |
-            ${{ runner.os }}-aurebesh-droid-
+    - name: Install build tools
+      run: |
+        sudo -E apt-get -qq update
+        sudo -E apt-get -y -qq install build-essential cmake ninja-build ccache
+        ccache --max-size=$CCACHE_MAXSIZE
+        ccache -z
 
-      - name: Install dependencies
-        run: |
-          sudo apt update
-          sudo apt install cmake build-essential libssl-dev
+    - id: setkey
+      run: echo "key=dpp-${{ hashFiles('extern/DPP/**') }}" >> "$GITHUB_OUTPUT"
 
-      - name: Build Aurebesh Droid
-        run: |
-          mkdir -p build
-          cd build
-          cmake -DCMAKE_BUILD_TYPE=Release ..
-          cmake --build . --target AurebeshDroid -- -j$(nproc)
+    - name: Restore cached DPP
+      id: dpp-cache
+      uses: actions/cache@v3
+      with:
+        path: build/dpp-install
+        key: ${{ steps.setkey.outputs.key }}
 
-      - name: Upload built bot
-        uses: actions/upload-artifact@v4
-        with:
-          name: aurebesh-droid
-          path: build/AurebeshDroid
+    - name: Configure & build DPP
+      if: steps.dpp-cache.outputs.cache-hit != 'true'
+      run: |
+        cmake -S extern/DPP -B build/dpp -G Ninja \
+              -DCMAKE_BUILD_TYPE=$CMAKE_BUILD_TYPE \
+              -DCMAKE_INSTALL_PREFIX=$PWD/build/dpp-install \
+              -DCMAKE_C_COMPILER_LAUNCHER=ccache \
+              -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
+        cmake --build build/dpp --parallel
+        cmake --install build/dpp
+
+    - name: Print ccache stats (DPP)
+      if: always()
+      run: ccache -s
+
+  build-bot:
+    needs: build-dpp
+    runs-on: ubuntu-24.04
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+        fetch-depth: 1
+
+    - name: Install build tools
+      run: |
+        sudo -E apt-get -qq update
+        sudo -E apt-get -y -qq install build-essential cmake ninja-build ccache libssl-dev
+        ccache --max-size=$CCACHE_MAXSIZE
+        ccache -z
+
+    - name: Restore build cache
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.ccache
+          build
+        key: ${{ runner.os }}-aurebesh-droid-${{ github.sha }}
+        restore-keys: |
+          ${{ runner.os }}-aurebesh-droid-
+
+    - name: Download DPP cache
+      uses: actions/cache@v3
+      with:
+        path: build/dpp-install
+        key: ${{ needs.build-dpp.outputs.cache-key }}
+
+    - name: Configure & build bot
+      run: |
+        cmake -S . -B build -G Ninja \
+              -DCMAKE_BUILD_TYPE=$CMAKE_BUILD_TYPE \
+              -DCMAKE_PREFIX_PATH=$PWD/build/dpp-install \
+              -DCMAKE_C_COMPILER_LAUNCHER=ccache \
+              -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
+        cmake --build build --target AurebeshDroid --parallel
+
+    - name: Print ccache stats (bot)
+      if: always()
+      run: ccache -s
+
+    - name: Upload Aurebesh Droid binary
+      uses: actions/upload-artifact@v4
+      with:
+        name: AurebeshDroid
+        path: build/AurebeshDroid
