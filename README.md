@@ -44,6 +44,12 @@ Created by **Abubakr Elmallah** on **June 18, 2025**.
    ./run-dev.sh
    ```
 
+### Deploy to Heroku
+
+If you'd prefer to use a precompiled Linux binary and deploy directly, see the [Aurebesh Droid Heroku Repository](https://github.com/TheAbubakrAbu/Aurebesh-Droid-Heroku).
+
+```
+
 ## Privacy & Data
 
 **Aurebesh Droid** respects your privacy:
