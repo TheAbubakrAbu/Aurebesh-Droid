@@ -37,6 +37,7 @@ endif()
 
 find_package(OpenSSL REQUIRED)
 set(BUILD_TESTING OFF)
+set(BUILD_SHARED_LIBS OFF)
 add_subdirectory(extern/DPP) 
 
 target_link_libraries(AurebeshDroid PRIVATE dpp OpenSSL::SSL OpenSSL::Crypto)
