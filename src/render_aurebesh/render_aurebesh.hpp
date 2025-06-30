@@ -21,7 +21,7 @@ inline bool renderTextToImage(const char* inputText, std::string& outPath, const
     namespace fs = std::filesystem;
 
     fs::path fontPath = fs::path(__FILE__).parent_path().parent_path() / "assets" / "fonts" / fontName;
-    fs::path outputPath = fs::path(__FILE__).parent_path().parent_path() / imageName;
+    fs::path outputPath = fs::temp_directory_path() / imageName;
     outPath = outputPath.string();
 
     int maxLineWidth = 2000;
