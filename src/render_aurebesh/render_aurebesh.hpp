@@ -21,6 +21,10 @@ inline bool renderTextToImage(const char* inputText, std::string& outPath, const
     namespace fs = std::filesystem;
 
     fs::path fontPath = fs::path(__FILE__).parent_path().parent_path() / "assets" / "fonts" / fontName;
+    if (!fs::exists(fontPath)) {
+        fontPath = fs::current_path() / "assets" / "fonts" / fontName;
+    }
+    
     fs::path outputPath = fs::temp_directory_path() / imageName;
     outPath = outputPath.string();
 
