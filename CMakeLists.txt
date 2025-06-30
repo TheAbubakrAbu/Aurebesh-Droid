@@ -1,9 +1,10 @@
 # CmakeLists.txt
 
-# To build and run Aurebesh Droid:
-#   chmod +x run-dev.sh run-release.sh
-#   ./run-dev.sh      # builds and runs in Debug mode
-#   ./run-release.sh  # builds and runs in Release mode
+# One-time setup:
+#   chmod +x run-dev.sh
+#
+# To build and run Aurebesh Droid (every time after that):
+#   ./run-dev.sh
 
 cmake_minimum_required(VERSION 3.10)
 project(AurebeshDroid LANGUAGES CXX)

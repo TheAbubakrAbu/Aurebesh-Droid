@@ -1,13 +1,13 @@
 #!/bin/bash
 # run-dev.sh
 
-# Builds and runs in debug mode using CMake presets
-# To build and run Aurebesh Droid:
-#   chmod +x run-dev.sh run-release.sh
-#   ./run-dev.sh      # builds and runs in Debug mode
-#   ./run-release.sh  # builds and runs in Release mode
+# One-time setup:
+#   chmod +x run-dev.sh
+#
+# To build and run Aurebesh Droid (every time after that):
+#   ./run-dev.sh
 
-killall AurebeshDroid
+pgrep AurebeshDroid && killall AurebeshDroid
 
 echo "🧪 Building in DEBUG mode..."
 
@@ -16,5 +16,6 @@ BUILD_DIR=~/Downloads/aurebesh-droid-debug
 mkdir -p "$BUILD_DIR"
 cd "$BUILD_DIR"
 
-cmake -DCMAKE_BUILD_TYPE=Debug "$OLDPWD"
+SOURCE_DIR="$(dirname "$(realpath "$0")")"
+cmake -DCMAKE_BUILD_TYPE=Debug "$SOURCE_DIR"
 cmake --build . --target run
