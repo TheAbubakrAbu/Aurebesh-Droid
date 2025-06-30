@@ -13,99 +13,43 @@ env:
   CCACHE_MAXSIZE: 200M
 
 jobs:
-  build-dpp:
+  build:
     runs-on: ubuntu-24.04
-    outputs:
-      cache-key: ${{ steps.setkey.outputs.key }}
 
     steps:
-    - name: Checkout repo (shallow, with submodules)
-      uses: actions/checkout@v4
+    - uses: actions/checkout@v4
       with:
         submodules: recursive
         fetch-depth: 1
 
     - name: Install build tools
       run: |
-        sudo -E apt-get -qq update
-        sudo -E apt-get -y -qq install build-essential cmake ninja-build ccache
+        sudo apt-get -qq update
+        sudo apt-get -y -qq install build-essential cmake ninja-build ccache libssl-dev
         ccache --max-size=$CCACHE_MAXSIZE
         ccache -z
 
-    - id: setkey
-      run: echo "key=dpp-${{ hashFiles('extern/DPP/**') }}" >> "$GITHUB_OUTPUT"
-
-    - name: Restore cached DPP
-      id: dpp-cache
-      uses: actions/cache@v3
-      with:
-        path: build/dpp-install
-        key: ${{ steps.setkey.outputs.key }}
-
-    - name: Configure & build DPP
-      if: steps.dpp-cache.outputs.cache-hit != 'true'
-      run: |
-        cmake -S extern/DPP -B build/dpp -G Ninja \
-              -DCMAKE_BUILD_TYPE=$CMAKE_BUILD_TYPE \
-              -DCMAKE_INSTALL_PREFIX=$PWD/build/dpp-install \
-              -DCMAKE_C_COMPILER_LAUNCHER=ccache \
-              -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
-        cmake --build build/dpp --parallel
-        cmake --install build/dpp
-
-    - name: Print ccache stats (DPP)
-      if: always()
-      run: ccache -s
-
-  build-bot:
-    needs: build-dpp
-    runs-on: ubuntu-24.04
-
-    steps:
-    - name: Checkout repo
-      uses: actions/checkout@v4
-      with:
-        submodules: recursive
-        fetch-depth: 1
-
-    - name: Install build tools
-      run: |
-        sudo -E apt-get -qq update
-        sudo -E apt-get -y -qq install build-essential cmake ninja-build ccache libssl-dev
-        ccache --max-size=$CCACHE_MAXSIZE
-        ccache -z
-
-    - name: Restore build cache
-      uses: actions/cache@v3
+    - uses: actions/cache@v3
       with:
         path: |
           ~/.ccache
           build
-        key: ${{ runner.os }}-aurebesh-droid-${{ github.sha }}
-        restore-keys: |
-          ${{ runner.os }}-aurebesh-droid-
+        key: ${{ runner.os }}-ccache-${{ hashFiles('**/*.cpp', '**/*.hpp', '**/CMakeLists.txt', '**/*.cmake', 'extern/DPP/**') }}
+        restore-keys: ${{ runner.os }}-ccache-
 
-    - name: Download DPP cache
-      uses: actions/cache@v3
-      with:
-        path: build/dpp-install
-        key: ${{ needs.build-dpp.outputs.cache-key }}
-
-    - name: Configure & build bot
+    - name: Configure & build
       run: |
         cmake -S . -B build -G Ninja \
               -DCMAKE_BUILD_TYPE=$CMAKE_BUILD_TYPE \
-              -DCMAKE_PREFIX_PATH=$PWD/build/dpp-install \
               -DCMAKE_C_COMPILER_LAUNCHER=ccache \
               -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
-        cmake --build build --target AurebeshDroid --parallel
+        cmake --build build --target AurebeshDroid --parallel $(nproc)
 
-    - name: Print ccache stats (bot)
+    - name: Show ccache stats
       if: always()
-      run: ccache -s
+      run: ccache -s --show-stats-format=slim
 
-    - name: Upload Aurebesh Droid binary
-      uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v4
       with:
         name: AurebeshDroid
         path: build/AurebeshDroid
