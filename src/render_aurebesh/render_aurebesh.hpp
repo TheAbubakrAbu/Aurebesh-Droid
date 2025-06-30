@@ -13,38 +13,93 @@
 #include <fstream>
 #include <vector>
 #include <cctype>
+#include <cstring>
 #include <filesystem>
+#include <unistd.h>
+#include <limits.h>
 
+#ifdef __APPLE__
+  #include <mach-o/dyld.h>
+#endif
+
+#ifdef _WIN32
+  #include <windows.h>
+#endif
+
+namespace fs = std::filesystem;
 using namespace std;
 
-inline bool renderTextToImage(const char* inputText, std::string& outPath, const std::string& imageName, const std::string& fontName, int fontSize = 96) {
-    namespace fs = std::filesystem;
+inline fs::path exe_dir() {
+#if defined(_WIN32)           // Windows
+    wchar_t buf[MAX_PATH]{};
+    DWORD n = GetModuleFileNameW(nullptr, buf, MAX_PATH);
+    return n ? fs::path(buf).parent_path() : fs::current_path();
 
-    fs::path fontPath = fs::path(__FILE__).parent_path().parent_path() / "assets" / "fonts" / fontName;
-    if (!fs::exists(fontPath)) {
-        fontPath = fs::current_path() / "assets" / "fonts" / fontName;
+#elif defined(__APPLE__)      // macOS
+    char buf[PATH_MAX]{};
+    uint32_t sz = sizeof(buf);
+    if (_NSGetExecutablePath(buf, &sz) == 0)
+        return fs::path(buf).parent_path();
+    else
+        return fs::current_path();
+
+#else                          // Linux
+    char buf[PATH_MAX]{};
+    ssize_t n = ::readlink("/proc/self/exe", buf, sizeof(buf) - 1);
+    return n > 0 ? fs::path(buf).parent_path() : fs::current_path();
+#endif
+}
+
+inline fs::path find_font(const std::string& fontName)
+{
+    auto exe = exe_dir();
+
+    static const fs::path SOURCE_SRC_DIR =
+        fs::path(__FILE__).parent_path().parent_path();
+
+    const fs::path candidates[] = {
+        exe / "assets" / "fonts" / fontName,                      // /app/assets/…
+        exe / "src" / "assets" / "fonts" / fontName,              // /app/src/…
+        exe.parent_path() / "src" / "assets" / "fonts" / fontName,// in-tree build
+        SOURCE_SRC_DIR / "assets" / "fonts" / fontName            // out-of-tree build
+    };
+
+    for (const auto& p : candidates) {
+        std::cout << "🔎 " << p << '\n';
+        if (fs::exists(p)) return p;
     }
-    
+    throw std::runtime_error("Font " + fontName + " not found");
+}
+
+inline bool renderTextToImage(const char* inputText, string& outPath, const string& imageName, const string& fontName, int fontSize = 96) {
+    fs::path fontPath;
+    try {
+        fontPath = find_font(fontName);
+    } catch(const std::exception& e) {
+        std::cerr << "❌ " << e.what() << '\n';
+        return false;
+    }
+
     fs::path outputPath = fs::temp_directory_path() / imageName;
     outPath = outputPath.string();
 
     int maxLineWidth = 2000;
     int padding = 40;
 
-    std::ifstream fontFile(fontPath, std::ios::binary | std::ios::ate);
+    ifstream fontFile(fontPath, ios::binary | ios::ate);
     if(!fontFile) {
-        std::cerr << "❌ Failed to open font file: " << fontPath << '\n';
+        cerr << "❌ Failed to open font file: " << fontPath << '\n';
         return false;
     }
 
-    std::streamsize fontSizeBytes = fontFile.tellg();
-    fontFile.seekg(0, std::ios::beg);
-    std::vector<unsigned char> fontBuffer(fontSizeBytes);
+    streamsize fontSizeBytes = fontFile.tellg();
+    fontFile.seekg(0, ios::beg);
+    vector<unsigned char> fontBuffer(fontSizeBytes);
     fontFile.read(reinterpret_cast<char*>(fontBuffer.data()), fontSizeBytes);
 
     stbtt_fontinfo font;
     if(!stbtt_InitFont(&font, fontBuffer.data(), 0)) {
-        std::cerr << "❌ Failed to initialize font.\n";
+        cerr << "❌ Failed to initialize font.\n";
         return false;
     }
 
@@ -53,8 +108,8 @@ inline bool renderTextToImage(const char* inputText, std::string& outPath, const
     stbtt_GetFontVMetrics(&font, &ascent, &descent, &lineGap);
     int lineHeight = static_cast<int>((ascent - descent + lineGap) * scale);
 
-    std::vector<std::string> lines;
-    std::string currentLine;
+    vector<string> lines;
+    string currentLine;
     int currentLineWidth = 0;
     int actualMaxLineWidth = 0;
 
@@ -85,11 +140,11 @@ inline bool renderTextToImage(const char* inputText, std::string& outPath, const
 
     int imageWidth = actualMaxLineWidth + 2 * padding;
     int imageHeight = static_cast<int>(lines.size()) * lineHeight + 2 * padding;
-    std::vector<unsigned char> image(imageWidth * imageHeight, 255);
+    vector<unsigned char> image(imageWidth * imageHeight, 255);
 
     for(int i = 0; i < lines.size(); ++i) {
         int x = padding;
-        const std::string& line = lines[i];
+        const string& line = lines[i];
 
         for(char ch : line) {
             ch = tolower(ch);
@@ -101,7 +156,7 @@ inline bool renderTextToImage(const char* inputText, std::string& outPath, const
 
             int y = padding + i * lineHeight +(lineHeight -(cy2 - cy1)) / 2;
 
-            std::vector<unsigned char> charBitmap((cx2 - cx1) *(cy2 - cy1));
+            vector<unsigned char> charBitmap((cx2 - cx1) *(cy2 - cy1));
             stbtt_MakeCodepointBitmap(&font, charBitmap.data(), cx2 - cx1, cy2 - cy1, cx2 - cx1, scale, scale, ch);
 
             for(int by = 0; by < cy2 - cy1; ++by) {
@@ -118,10 +173,10 @@ inline bool renderTextToImage(const char* inputText, std::string& outPath, const
     }
 
     if(!stbi_write_png(outPath.c_str(), imageWidth, imageHeight, 1, image.data(), imageWidth)) {
-        std::cerr << "❌ Failed to save image.\n";
+        cerr << "❌ Failed to save image.\n";
         return false;
     }
 
-    std::cout << "✅ Rendered image saved to " << outputPath << '\n';
+    cout << "✅ Rendered image saved to " << outputPath << '\n';
     return true;
 }

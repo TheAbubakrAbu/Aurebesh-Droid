@@ -49,14 +49,8 @@ jobs:
       if: always()
       run: ccache -s
 
-    - name: Copy font assets
-      run: |
-        mkdir -p build/assets/fonts
-        cp -r src/assets/fonts/* build/assets/fonts/
-
     - uses: actions/upload-artifact@v4
       with:
         name: AurebeshDroid
         path: |
           build/AurebeshDroid
-          build/assets/**
