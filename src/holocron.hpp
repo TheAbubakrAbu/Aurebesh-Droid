@@ -19,7 +19,7 @@ struct HolocronInfo {
 };
 
 HolocronInfo get_holocron_metadata(const string& author, const string& command) {
-    string blue = "https://raw.githubusercontent.com/TheAbubakrAbu/Aurebesh-Droid/main/src/assets/images/aurebesh.png";
+    string blue = "https://raw.githubusercontent.com/TheAbubakrAbu/Aurebesh-Droid/main/src/assets/images/blue.png";
     string green = "https://raw.githubusercontent.com/TheAbubakrAbu/Aurebesh-Droid/main/src/assets/images/green.png";
     string yellow = "https://raw.githubusercontent.com/TheAbubakrAbu/Aurebesh-Droid/main/src/assets/images/yellow.png";
     string purple = "https://raw.githubusercontent.com/TheAbubakrAbu/Aurebesh-Droid/main/src/assets/images/purple.png";

@@ -28,7 +28,42 @@ int main() {
 
         if(dpp::run_once<struct register_commands>()) {
             bot.global_command_create(
-                dpp::slashcommand("translate", "Convert English text to Aurebesh", bot.me.id)
+                dpp::slashcommand("translate", "Convert English text to Standard Aurebesh", bot.me.id)
+                    .add_option(dpp::command_option(dpp::co_string, "text", "Text to translate", true))
+            );
+
+            bot.global_command_create(
+                dpp::slashcommand("translate standard aurebesh", "Convert English text to Standard Aurebesh", bot.me.id)
+                    .add_option(dpp::command_option(dpp::co_string, "text", "Text to translate", true))
+            );
+
+            bot.global_command_create(
+                dpp::slashcommand("translate cantina aurebesh", "Convert English text to Cantina Aurebesh", bot.me.id)
+                    .add_option(dpp::command_option(dpp::co_string, "text", "Text to translate", true))
+            );
+
+            bot.global_command_create(
+                dpp::slashcommand("translate droid aurebesh", "Convert English text to Droid Aurebesh", bot.me.id)
+                    .add_option(dpp::command_option(dpp::co_string, "text", "Text to translate", true))
+            );
+
+            bot.global_command_create(
+                dpp::slashcommand("translate new mandoa", "Convert English text to New Mando'a", bot.me.id)
+                    .add_option(dpp::command_option(dpp::co_string, "text", "Text to translate", true))
+            );
+
+            bot.global_command_create(
+                dpp::slashcommand("translate old mandoa", "Convert English text to Old Mando'a", bot.me.id)
+                    .add_option(dpp::command_option(dpp::co_string, "text", "Text to translate", true))
+            );
+
+            bot.global_command_create(
+                dpp::slashcommand("translate outer rim", "Convert English text to Outer Rim", bot.me.id)
+                    .add_option(dpp::command_option(dpp::co_string, "text", "Text to translate", true))
+            );
+
+            bot.global_command_create(
+                dpp::slashcommand("translate sith", "Convert English text to Sith Outer Rim", bot.me.id)
                     .add_option(dpp::command_option(dpp::co_string, "text", "Text to translate", true))
             );
 
@@ -45,11 +80,11 @@ int main() {
             );
 
             bot.global_command_create(
-                dpp::slashcommand("holocron_jedi", "Use the Force and unlock the secrets of the Jedi", bot.me.id)
+                dpp::slashcommand("holocron jedi", "Use the Force and unlock the secrets of the Jedi", bot.me.id)
             );
 
             bot.global_command_create(
-                dpp::slashcommand("holocron_sith", "Use the Force and unlock the secrets of the Sith", bot.me.id)
+                dpp::slashcommand("holocron sith", "Use the Force and unlock the secrets of the Sith", bot.me.id)
             );
 
             bot.global_command_create(
@@ -60,13 +95,32 @@ int main() {
 
     bot.on_slashcommand([&bot](const dpp::slashcommand_t& event) {
         const string command = event.command.get_command_name();
+        
+        const unordered_map<string, string> fontMap = {
+            // Aurebesh
+            { "translate standard aurebesh", "AurebeshStandard.ttf" },
+            { "translate cantina aurebesh", "AurebeshCantina.ttf" },
+            { "translate droid aurebesh", "AurebeshDroid.otf" },
+
+            // Mando'a
+            { "translate new mandoa", "MandoNew.ttf" },
+            { "translate old mandoa", "MandoOld.ttf" },
+
+            // Outer Rim
+            { "translate outer rim", "OuterRimBasic.otf" },
+            { "translate sith", "OuterRimSith.ttf" }
+        };
+
+        auto it = fontMap.find(command);
 
         if(command == "alphabet" || command == "aurebesh") {
             alphabetCommand(event);
         } else if(command == "help") {
             helpCommand(event);
-        } else if (command == "translate") {
+        } else if(command == "translate") {
             translateCommand(event);
+        } if(it != fontMap.end()) {
+            translateCommand(event, it->second);
         } else if(contains(command, "holocron")) {
             holocronCommand(event, command);
         }
