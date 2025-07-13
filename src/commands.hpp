@@ -77,7 +77,7 @@ inline void helpCommand(const dpp::slashcommand_t& event) {
     event.reply(dpp::message().add_embed(embed));
 }
 
-inline void translateCommand(const dpp::slashcommand_t& event) {
+inline void translateCommand(const dpp::slashcommand_t& event, const string& font = "AurebeshStandard.ttf") {
     const string input = get<string>(event.get_parameter("text"));
     if (input.empty()) {
         event.reply("❌ Please enter at least one character.");
@@ -86,14 +86,14 @@ inline void translateCommand(const dpp::slashcommand_t& event) {
 
     event.thinking();
 
-    thread([event, input]() mutable {
+    thread([event, input, font]() mutable {
         ostringstream oss;
         oss << "aurebesh_" << event.command.usr.id << '_' << event.command.channel_id << '_' << chrono::duration_cast<chrono::milliseconds>(chrono::system_clock::now().time_since_epoch()).count()<< ".png";
 
         const string imgName = oss.str();
 
         string imgPath;
-        if (!renderTextToImage(input.c_str(), imgPath, imgName, "StandardAurebesh.otf")) {
+        if (!renderTextToImage(input.c_str(), imgPath, imgName, font)) {
             event.edit_response("❌ Failed to render Aurebesh image.");
             return;
         }
