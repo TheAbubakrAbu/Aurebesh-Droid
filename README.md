@@ -4,9 +4,13 @@
 
 The bot includes dynamic **Jedi and Sith holocrons** that unlock hidden wisdom from across the galaxy, adding a rich layer of interactivity and mystery to the experience.
 
+Created by **Abubakr Elmallah** on **June 18, 2025**.
+
 [**Add Aurebesh Droid to Your Server**](https://discord.ly/aurebesh-droid)
 
-Created by **Abubakr Elmallah** on **June 18, 2025**.
+<a href="https://discord.ly/aurebesh-droid">
+  <img src="logo.png" alt="Logo" width="120" style="border-radius:10px;"/>
+</a>
 
 ## Features
 
