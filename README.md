@@ -9,7 +9,7 @@ Created by **Abubakr Elmallah** on **June 18, 2025**.
 [**Add Aurebesh Droid to Your Discord Server**](https://discord.ly/aurebesh-droid)
 
 <a href="https://discord.ly/aurebesh-droid">
-  <img src="logo.png" alt="Logo" width="120" style="border-radius:10px;"/>
+  <img src="logo.jpg" alt="Logo" width="120" style="border-radius:10px;"/>
 </a>
 
 ## Features

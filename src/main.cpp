@@ -26,70 +26,76 @@ int main() {
 
         cout << "Bot is up: " << bot.me.username << '\n';
 
-        if(dpp::run_once<struct register_commands>()) {
-            bot.global_command_create(
+        if (dpp::run_once<struct register_commands>()) {
+            std::vector<dpp::slashcommand> commands;
+
+            // --- Translation commands ---
+            commands.push_back(
                 dpp::slashcommand("translate", "Convert English text to Standard Aurebesh", bot.me.id)
                     .add_option(dpp::command_option(dpp::co_string, "text", "Text to translate", true))
             );
 
-            bot.global_command_create(
-                dpp::slashcommand("translate standard aurebesh", "Convert English text to Standard Aurebesh", bot.me.id)
+            commands.push_back(
+                dpp::slashcommand("translate_standard", "Convert English text to Standard Aurebesh", bot.me.id)
                     .add_option(dpp::command_option(dpp::co_string, "text", "Text to translate", true))
             );
 
-            bot.global_command_create(
-                dpp::slashcommand("translate cantina aurebesh", "Convert English text to Cantina Aurebesh", bot.me.id)
+            commands.push_back(
+                dpp::slashcommand("translate_cantina", "Convert English text to Cantina Aurebesh", bot.me.id)
                     .add_option(dpp::command_option(dpp::co_string, "text", "Text to translate", true))
             );
 
-            bot.global_command_create(
-                dpp::slashcommand("translate droid aurebesh", "Convert English text to Droid Aurebesh", bot.me.id)
+            commands.push_back(
+                dpp::slashcommand("translate_droid", "Convert English text to Droid Aurebesh", bot.me.id)
                     .add_option(dpp::command_option(dpp::co_string, "text", "Text to translate", true))
             );
 
-            bot.global_command_create(
-                dpp::slashcommand("translate new mandoa", "Convert English text to New Mando'a", bot.me.id)
+            commands.push_back(
+                dpp::slashcommand("translate_mandoa_new", "Convert English text to New Mando'a", bot.me.id)
                     .add_option(dpp::command_option(dpp::co_string, "text", "Text to translate", true))
             );
 
-            bot.global_command_create(
-                dpp::slashcommand("translate old mandoa", "Convert English text to Old Mando'a", bot.me.id)
+            commands.push_back(
+                dpp::slashcommand("translate_mandoa_old", "Convert English text to Old Mando'a", bot.me.id)
                     .add_option(dpp::command_option(dpp::co_string, "text", "Text to translate", true))
             );
 
-            bot.global_command_create(
-                dpp::slashcommand("translate outer rim", "Convert English text to Outer Rim", bot.me.id)
+            commands.push_back(
+                dpp::slashcommand("translate_outerrim", "Convert English text to Outer Rim", bot.me.id)
                     .add_option(dpp::command_option(dpp::co_string, "text", "Text to translate", true))
             );
 
-            bot.global_command_create(
-                dpp::slashcommand("translate sith", "Convert English text to Sith Outer Rim", bot.me.id)
+            commands.push_back(
+                dpp::slashcommand("translate_sith", "Convert English text to Sith Outer Rim", bot.me.id)
                     .add_option(dpp::command_option(dpp::co_string, "text", "Text to translate", true))
             );
 
-            bot.global_command_create(
+            // --- Other commands ---
+            commands.push_back(
                 dpp::slashcommand("alphabet", "Display the Aurebesh alphabet", bot.me.id)
             );
 
-            bot.global_command_create(
+            commands.push_back(
                 dpp::slashcommand("aurebesh", "Display the Aurebesh alphabet", bot.me.id)
             );
-            
-            bot.global_command_create(
+
+            commands.push_back(
                 dpp::slashcommand("holocron", "Use the Force and unlock the secrets of the Jedi or the Sith", bot.me.id)
             );
 
-            bot.global_command_create(
-                dpp::slashcommand("holocron jedi", "Use the Force and unlock the secrets of the Jedi", bot.me.id)
+            commands.push_back(
+                dpp::slashcommand("holocron_jedi", "Use the Force and unlock the secrets of the Jedi", bot.me.id)
             );
 
-            bot.global_command_create(
-                dpp::slashcommand("holocron sith", "Use the Force and unlock the secrets of the Sith", bot.me.id)
+            commands.push_back(
+                dpp::slashcommand("holocron_sith", "Use the Force and unlock the secrets of the Sith", bot.me.id)
             );
 
-            bot.global_command_create(
+            commands.push_back(
                 dpp::slashcommand("help", "Display Aurebesh Droid Help", bot.me.id)
             );
+
+            bot.global_bulk_command_create(commands);
         }
     });
 
