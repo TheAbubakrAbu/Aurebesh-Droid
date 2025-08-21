@@ -6,7 +6,7 @@
 # To build and run Aurebesh Droid (every time after that):
 #   ./run.sh
 
-cmake_minimum_required(VERSION 3.16)  # bump for modern features
+cmake_minimum_required(VERSION 3.16)
 project(AurebeshDroid LANGUAGES CXX)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
