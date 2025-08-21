@@ -15,19 +15,50 @@
 #include <cctype>
 #include <cstring>
 #include <filesystem>
+#include <unistd.h>
+#include <limits.h>
 
 namespace fs = std::filesystem;
 using namespace std;
 
-inline fs::path project_root() {
-    return fs::path(__FILE__).parent_path();
+inline fs::path exe_dir() {
+    char buf[PATH_MAX]{};
+    ssize_t n = ::readlink("/proc/self/exe", buf, sizeof(buf)-1);
+    return(n > 0) ? fs::path(buf).parent_path() : fs::current_path();
+}
+
+inline bool is_regular(const fs::path& p) {
+    std::error_code ec;
+    return fs::exists(p, ec) && fs::is_regular_file(p, ec);
+}
+
+inline fs::path try_font(const fs::path& base, const std::string& name) {
+    fs::path p = base / name;
+    if(is_regular(p)) return p;
+    if(!fs::path(name).has_extension()) {
+        for(const char* ext : {".otf", ".ttf"}) {
+            fs::path q = base /(name + ext);
+            if(is_regular(q)) return q;
+        }
+    }
+    return {};
 }
 
 inline fs::path find_font(const std::string& fontName) {
-    const fs::path p = project_root() / "assets" / "fonts" / fontName;
-    std::cout << "🔎 " << p << '\n';
-    if (fs::exists(p)) return p;
-    throw std::runtime_error("Font not found at " + p.string());
+    for(const fs::path base : {
+            exe_dir() / "assets" / "fonts",
+            fs::current_path() / "src" / "assets" / "fonts",
+            fs::current_path() / "assets" / "fonts"
+        })
+    {
+        if(auto hit = try_font(base, fontName); !hit.empty()) {
+            std::cout << "🔎 " << hit << '\n';
+            return hit;
+        } else {
+            std::cout << "🔎 " <<(base / fontName) << "(not found)\n";
+        }
+    }
+    throw std::runtime_error("Font not found: " + fontName);
 }
 
 inline bool renderTextToImage(
@@ -39,7 +70,7 @@ inline bool renderTextToImage(
     fs::path fontPath;
     try {
         fontPath = find_font(fontName);
-    } catch (const std::exception& e) {
+    } catch(const std::exception& e) {
         std::cerr << "❌ " << e.what() << '\n';
         return false;
     }
@@ -115,9 +146,9 @@ inline bool renderTextToImage(
             int cx1, cy1, cx2, cy2;
             stbtt_GetCodepointBitmapBox(&font, ch, scale, scale, &cx1, &cy1, &cx2, &cy2);
 
-            int y = padding + static_cast<int>(i) * lineHeight + (lineHeight - (cy2 - cy1)) / 2;
+            int y = padding + static_cast<int>(i) * lineHeight +(lineHeight -(cy2 - cy1)) / 2;
 
-            vector<unsigned char> charBitmap((cx2 - cx1) * (cy2 - cy1));
+            vector<unsigned char> charBitmap((cx2 - cx1) *(cy2 - cy1));
             stbtt_MakeCodepointBitmap(&font, charBitmap.data(), cx2 - cx1, cy2 - cy1, cx2 - cx1, scale, scale, ch);
 
             for(int by = 0; by < cy2 - cy1; ++by) {
@@ -125,7 +156,7 @@ inline bool renderTextToImage(
                     int dst_x = x + bx;
                     int dst_y = y + by;
                     if(dst_x < 0 || dst_x >= imageWidth || dst_y < 0 || dst_y >= imageHeight) continue;
-                    image[dst_y * imageWidth + dst_x] = 255 - charBitmap[by * (cx2 - cx1) + bx];
+                    image[dst_y * imageWidth + dst_x] = 255 - charBitmap[by *(cx2 - cx1) + bx];
                 }
             }
 
