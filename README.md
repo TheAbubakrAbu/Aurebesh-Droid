@@ -4,6 +4,8 @@
 
 The bot includes dynamic **Jedi and Sith holocrons** that unlock hidden wisdom from across the galaxy, adding a rich layer of interactivity and mystery to the experience.
 
+This repository also contains the **Linux-ready Aurebesh Droid Discord Bot binary** and configuration needed to deploy the bot to **Heroku** using [this buildpack](https://github.com/ph3nx/heroku-binary-buildpack.git).
+
 Created by **Abubakr Elmallah** on **June 18, 2025**.
 
 [**Add Aurebesh Droid to Your Discord Server**](https://discord.ly/aurebesh-droid)
@@ -45,7 +47,7 @@ Created by **Abubakr Elmallah** on **June 18, 2025**.
 4. **Run the Bot**:
 
    ```bash
-   ./run-dev.sh
+   ./run.sh
    ```
 
 ### Deploy to Heroku
