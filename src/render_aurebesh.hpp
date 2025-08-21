@@ -3,11 +3,11 @@
 #pragma once
 
 #define STB_TRUETYPE_IMPLEMENTATION
-#include "stb_truetype.h"
+#include "font_image/stb_truetype.h"
 
 #define STBI_NO_HDR
 #define STB_IMAGE_WRITE_IMPLEMENTATION
-#include "stb_image_write.h"
+#include "font_image/stb_image_write.h"
 
 #include <iostream>
 #include <fstream>
@@ -20,7 +20,7 @@ namespace fs = std::filesystem;
 using namespace std;
 
 inline fs::path project_root() {
-    return fs::path(__FILE__).parent_path().parent_path();
+    return fs::path(__FILE__).parent_path();
 }
 
 inline fs::path find_font(const std::string& fontName) {
