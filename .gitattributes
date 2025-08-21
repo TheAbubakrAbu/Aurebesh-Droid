@@ -1,2 +1,2 @@
-src/render_aurebesh/stb_image_write.h linguist-vendored
-src/render_aurebesh/stb_truetype.h linguist-vendored
+src/font_image/stb_image_write.h linguist-vendored
+src/font_image/stb_truetype.h linguist-vendored

@@ -1,6 +1,6 @@
 # .github/workflows/build.yml
 
-name: Build Linux Binary
+name: Build Aurebesh Droid Linux Binary
 
 on:
   push:
@@ -18,54 +18,51 @@ jobs:
     runs-on: ubuntu-24.04
 
     steps:
-    # Always start with repo + submodules
-    - uses: actions/checkout@v4
-      with:
-        submodules: recursive
-        fetch-depth: 0   # more reliable with submodules & versioning
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
 
-    # Toolchain installation
-    - name: Install build tools
-      run: |
-        sudo apt-get -qq update
-        sudo apt-get -y -qq install \
-          build-essential cmake ninja-build ccache libssl-dev pkg-config
-        ccache --max-size=$CCACHE_MAXSIZE
-        ccache -z
+      - name: Install build tools
+        run: |
+          sudo apt-get -qq update
+          sudo apt-get -y -qq install \
+            build-essential cmake ninja-build ccache libssl-dev pkg-config
+          ccache --max-size=$CCACHE_MAXSIZE
+          ccache -z
 
-    # Cache object files + build directory
-    - uses: actions/cache@v3
-      with:
-        path: |
-          ~/.ccache
-          ${{ env.BUILD_DIR }}
-        key: ${{ runner.os }}-ccache-${{ hashFiles('**/*.cpp', '**/*.hpp', '**/CMakeLists.txt', '**/*.cmake', 'extern/DPP/**') }}
-        restore-keys: |
-          ${{ runner.os }}-ccache-
+      - uses: actions/cache@v3
+        with:
+          path: |
+            ~/.ccache
+            ${{ env.BUILD_DIR }}
+          key: ${{ runner.os }}-ccache-${{ hashFiles('**/*.cpp', '**/*.hpp', '**/CMakeLists.txt', '**/*.cmake', 'extern/DPP/**') }}
+          restore-keys: |
+            ${{ runner.os }}-ccache-
 
-    # Configure & build
-    - name: Configure & build
-      run: |
-        cmake -S . -B $BUILD_DIR -G Ninja \
-              -DCMAKE_BUILD_TYPE=$CMAKE_BUILD_TYPE \
-              -DCMAKE_C_COMPILER_LAUNCHER=ccache \
-              -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
-        cmake --build $BUILD_DIR --target AurebeshDroid --parallel $(nproc)
+      - name: Configure & build
+        run: |
+          cmake -S . -B $BUILD_DIR -G Ninja \
+                -DCMAKE_BUILD_TYPE=$CMAKE_BUILD_TYPE \
+                -DCMAKE_C_COMPILER_LAUNCHER=ccache \
+                -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
+          cmake --build $BUILD_DIR --target AurebeshDroid --parallel $(nproc)
 
-    # Run a basic check to confirm binary exists & is executable
-    - name: Verify binary
-      run: |
-        ls -lh $BUILD_DIR/AurebeshDroid
-        file $BUILD_DIR/AurebeshDroid
-        test -x $BUILD_DIR/AurebeshDroid
+      - name: Verify binary
+        run: |
+          ls -lh $BUILD_DIR/AurebeshDroid
+          file $BUILD_DIR/AurebeshDroid
+          test -x $BUILD_DIR/AurebeshDroid
 
-    # Show ccache stats even if build fails
-    - name: Show ccache stats
-      if: always()
-      run: ccache -s
+      - name: Rename binary
+        run: |
+          mv $BUILD_DIR/AurebeshDroid $BUILD_DIR/LinuxBinary
 
-    # Upload binary as artifact
-    - uses: actions/upload-artifact@v4
-      with:
-        name: AurebeshDroid
-        path: ${{ env.BUILD_DIR }}/AurebeshDroid
+      - name: Show ccache stats
+        if: always()
+        run: ccache -s
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: LinuxBinary
+          path: ${{ env.BUILD_DIR }}/LinuxBinary

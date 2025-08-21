@@ -22,7 +22,6 @@ Makefile
 
 # Environment files
 .env
-.vscode
 
 # Logs
 *.log

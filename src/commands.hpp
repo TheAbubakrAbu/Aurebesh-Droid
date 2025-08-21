@@ -9,7 +9,7 @@
 
 #include "aurebesh.hpp"
 #include "holocron.hpp"
-#include "render_aurebesh/render_aurebesh.hpp"
+#include "render_aurebesh.hpp"
 
 using namespace std;
 
@@ -77,7 +77,7 @@ inline void helpCommand(const dpp::slashcommand_t& event) {
     event.reply(dpp::message().add_embed(embed));
 }
 
-inline void translateCommand(const dpp::slashcommand_t& event, const string& font = "AurebeshStandard.ttf") {
+inline void translateCommand(const dpp::slashcommand_t& event, const string& font = "AurebeshBasic.otf") {
     const string input = get<string>(event.get_parameter("text"));
     if (input.empty()) {
         event.reply("❌ Please enter at least one character.");
