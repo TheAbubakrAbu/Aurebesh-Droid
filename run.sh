@@ -7,11 +7,8 @@
 # To build and run Aurebesh Droid (every time after that):
 #   ./run.sh
 
-#!/bin/bash
-# run.sh
 set -euo pipefail
 
-# stop if running
 pkill -x AurebeshDroid 2>/dev/null || true
 
 echo "🧪 Building in DEBUG mode..."
