@@ -4,6 +4,7 @@
 
 # Ignore build artifacts
 /build/
+/build.nosync/
 *.o
 *.obj
 *.so
