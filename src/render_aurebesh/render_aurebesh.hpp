@@ -30,12 +30,12 @@ inline fs::path find_font(const std::string& fontName) {
     throw std::runtime_error("Font not found at " + p.string());
 }
 
-inline bool renderTextToImage(const char* inputText,
-                              string& outPath,
-                              const string& imageName,
-                              const string& fontName,
-                              int fontSize = 96)
-{
+inline bool renderTextToImage(
+    const char* inputText, string& outPath,
+    const string& imageName,
+    const string& fontName,
+    int fontSize = 96
+) {
     fs::path fontPath;
     try {
         fontPath = find_font(fontName);
