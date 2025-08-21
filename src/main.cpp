@@ -2,6 +2,7 @@
 
 #include <cstdlib>
 #include <iostream>
+#include <unordered_map>
 
 #include <dpp/dpp.h>
 
@@ -26,17 +27,22 @@ int main() {
 
         cout << "Bot is up: " << bot.me.username << '\n';
 
-        if (dpp::run_once<struct register_commands>()) {
+        if(dpp::run_once<struct register_commands>()) {
             std::vector<dpp::slashcommand> commands;
 
             // --- Translation commands ---
             commands.push_back(
-                dpp::slashcommand("translate", "Convert English text to Standard Aurebesh", bot.me.id)
+                dpp::slashcommand("translate", "Convert English text to Basic Aurebesh", bot.me.id)
                     .add_option(dpp::command_option(dpp::co_string, "text", "Text to translate", true))
             );
 
             commands.push_back(
-                dpp::slashcommand("translate_standard", "Convert English text to Standard Aurebesh", bot.me.id)
+                dpp::slashcommand("translate_basic", "Convert English text to Basic Aurebesh", bot.me.id)
+                    .add_option(dpp::command_option(dpp::co_string, "text", "Text to translate", true))
+            );
+
+            commands.push_back(
+                dpp::slashcommand("translate_core", "Convert English text to Core Aurebesh", bot.me.id)
                     .add_option(dpp::command_option(dpp::co_string, "text", "Text to translate", true))
             );
 
@@ -46,7 +52,17 @@ int main() {
             );
 
             commands.push_back(
+                dpp::slashcommand("translate_nexus", "Convert English text to Nexus Aurebesh", bot.me.id)
+                    .add_option(dpp::command_option(dpp::co_string, "text", "Text to translate", true))
+            );
+
+            commands.push_back(
                 dpp::slashcommand("translate_droid", "Convert English text to Droid Aurebesh", bot.me.id)
+                    .add_option(dpp::command_option(dpp::co_string, "text", "Text to translate", true))
+            );
+
+            commands.push_back(
+                dpp::slashcommand("translate_pixel", "Convert English text to Pixel Aurebesh", bot.me.id)
                     .add_option(dpp::command_option(dpp::co_string, "text", "Text to translate", true))
             );
 
@@ -66,7 +82,22 @@ int main() {
             );
 
             commands.push_back(
-                dpp::slashcommand("translate_sith", "Convert English text to Sith Outer Rim", bot.me.id)
+                dpp::slashcommand("translate_tongue", "Convert English text to Outer Rim Sith Tongue", bot.me.id)
+                    .add_option(dpp::command_option(dpp::co_string, "text", "Text to translate", true))
+            );
+
+            commands.push_back(
+                dpp::slashcommand("translate_geonosian", "Convert English text to Outer Rim Geonosian", bot.me.id)
+                    .add_option(dpp::command_option(dpp::co_string, "text", "Text to translate", true))
+            );
+
+            commands.push_back(
+                dpp::slashcommand("translate_trade", "Convert English text to Outer Rim Trade Federation", bot.me.id)
+                    .add_option(dpp::command_option(dpp::co_string, "text", "Text to translate", true))
+            );
+
+            commands.push_back(
+                dpp::slashcommand("translate_protobesh", "Convert English text to Outer Rim Protobesh", bot.me.id)
                     .add_option(dpp::command_option(dpp::co_string, "text", "Text to translate", true))
             );
 
@@ -100,21 +131,27 @@ int main() {
     });
 
     bot.on_slashcommand([&bot](const dpp::slashcommand_t& event) {
-        const string command = event.command.get_command_name();
-        
-        const unordered_map<string, string> fontMap = {
+        const std::string command = event.command.get_command_name();
+
+        static const std::unordered_map<std::string, std::string> fontMap = {
             // Aurebesh
-            { "translate standard aurebesh", "AurebeshStandard.ttf" },
-            { "translate cantina aurebesh", "AurebeshCantina.ttf" },
-            { "translate droid aurebesh", "AurebeshDroid.otf" },
+            { "translate_basic", "AurebeshBasic.otf" },
+            { "translate_core", "AurebeshCore.otf" },
+            { "translate_cantina", "AurebeshCantina.otf" },
+            { "translate_nexus", "AurebeshEquinox.otf" },
+            { "translate_droid", "AurebeshDroid.otf" },
+            { "translate_pixel", "AurebeshPixel.otf" },
 
             // Mando'a
-            { "translate new mandoa", "MandoNew.ttf" },
-            { "translate old mandoa", "MandoOld.ttf" },
+            { "translate_mandoa_new", "MandoNew.otf" },
+            { "translate_mandoa_old", "MandoOld.otf" },
 
             // Outer Rim
-            { "translate outer rim", "OuterRimBasic.otf" },
-            { "translate sith", "OuterRimSith.ttf" }
+            { "translate_outerrim",  "OuterRimBasic.otf" },
+            { "translate_tongue",    "OuterRimTongue.otf" },
+            { "translate_geonosian", "OuterRimHive.otf" },
+            { "translate_trade",     "OuterRimTrade.otf" },
+            { "translate_protobesh", "OuterRimProtobesh.otf" },
         };
 
         auto it = fontMap.find(command);
@@ -125,10 +162,12 @@ int main() {
             helpCommand(event);
         } else if(command == "translate") {
             translateCommand(event);
-        } if(it != fontMap.end()) {
+        } else if (it != fontMap.end()) {
             translateCommand(event, it->second);
-        } else if(contains(command, "holocron")) {
+        } else if(command.find("holocron") != std::string::npos) {
             holocronCommand(event, command);
+        } else {
+            //
         }
     });
     
