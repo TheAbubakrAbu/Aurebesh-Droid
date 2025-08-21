@@ -1,3 +1,3 @@
 # Procfile
 
-worker: ./AurebeshDroid-LinuxBinary
+worker: ./LinuxBinary
