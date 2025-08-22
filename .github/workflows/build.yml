@@ -4,8 +4,7 @@ name: Build & Release Aurebesh Droid (Linux)
 
 on:
   push:
-    tags:
-      - "v*.*.*" 
+    branches: [ main ]   # <- release on every push to main
 
 env:
   CMAKE_BUILD_TYPE: Release
@@ -18,7 +17,6 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-24.04
-
     steps:
       - uses: actions/checkout@v4
         with:
@@ -29,7 +27,7 @@ jobs:
         run: |
           sudo apt-get -qq update
           sudo apt-get -y -qq install \
-            build-essential cmake ninja-build ccache libssl-dev pkg-config jq
+            build-essential cmake ninja-build ccache libssl-dev pkg-config
           ccache --max-size=$CCACHE_MAXSIZE
           ccache -z
 
@@ -57,15 +55,14 @@ jobs:
           test -x $BUILD_DIR/AurebeshDroid
 
       - name: Rename to Release asset name
-        run: |
-          mv $BUILD_DIR/AurebeshDroid $BUILD_DIR/LinuxBinary
+        run: mv $BUILD_DIR/AurebeshDroid $BUILD_DIR/LinuxBinary
 
-      - name: Create GitHub Release
-        id: create_release
+      - name: Create/Update "nightly" GitHub Release (mark as latest)
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.ref_name }}
-          name: ${{ github.ref_name }}
+          tag_name: nightly                 # fixed tag that we reuse
+          name: Nightly                    # release name
+          make_latest: true                # mark this as the "latest" release
           draft: false
           prerelease: false
           files: ${{ env.BUILD_DIR }}/LinuxBinary
@@ -75,3 +72,13 @@ jobs:
       - name: Show ccache stats
         if: always()
         run: ccache -s
+
+      - name: Restart Heroku dynos
+        if: always()
+        run: |
+          curl -X DELETE "https://api.heroku.com/apps/${HEROKU_APP_NAME}/dynos" \
+            -H "Accept: application/vnd.heroku+json; version=3" \
+            -H "Authorization: Bearer ${HEROKU_API_KEY}"
+        env:
+          HEROKU_APP_NAME: ${{ secrets.HEROKU_APP_NAME }}
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
