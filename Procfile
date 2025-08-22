@@ -1,3 +1,1 @@
-# Procfile
-
-worker: ./src/LinuxBinary
+worker: bash ./start-worker.sh

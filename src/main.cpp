@@ -133,25 +133,25 @@ int main() {
     bot.on_slashcommand([&bot](const dpp::slashcommand_t& event) {
         const std::string command = event.command.get_command_name();
 
-        static const std::unordered_map<std::string, std::string> fontMap = {
+        static const std::unordered_map<std::string, std::pair<std::string, std::string>> fontMap = {
             // Aurebesh
-            { "translate_basic", "AurebeshBasic.otf" },
-            { "translate_core", "AurebeshCore.otf" },
-            { "translate_cantina", "AurebeshCantina.otf" },
-            { "translate_nexus", "AurebeshEquinox.otf" },
-            { "translate_droid", "AurebeshDroid.otf" },
-            { "translate_pixel", "AurebeshPixel.otf" },
+            { "translate_basic",      { "Aurebesh Basic",   "AurebeshBasic.otf"   } },
+            { "translate_core",       { "Aurebesh Core",    "AurebeshCore.otf"    } },
+            { "translate_cantina",    { "Aurebesh Cantina", "AurebeshCantina.otf" } },
+            { "translate_nexus",      { "Aurebesh Nexus",   "AurebeshEquinox.otf" } },
+            { "translate_droid",      { "Aurebesh Droid",   "AurebeshDroid.otf"   } },
+            { "translate_pixel",      { "Aurebesh Pixel",   "AurebeshPixel.otf"   } },
 
             // Mando'a
-            { "translate_mandoa_new", "MandoNew.otf" },
-            { "translate_mandoa_old", "MandoOld.otf" },
+            { "translate_mandoa_new", { "New Mando'a", "MandoNew.otf" } },
+            { "translate_mandoa_old", { "Old Mando'a", "MandoOld.otf" } },
 
             // Outer Rim
-            { "translate_outerrim",  "OuterRimBasic.otf" },
-            { "translate_tongue",    "OuterRimTongue.otf" },
-            { "translate_geonosian", "OuterRimHive.otf" },
-            { "translate_trade",     "OuterRimTrade.otf" },
-            { "translate_protobesh", "OuterRimProtobesh.otf" },
+            { "translate_outerrim",   { "Outer Rim Basic",   "OuterRimBasic.otf"     } },
+            { "translate_tongue",     { "Outer Rim Tongue",  "OuterRimTongue.otf"    } },
+            { "translate_geonosian", { "Outer Rim Geonosian","OuterRimHive.otf"     } },
+            { "translate_trade",     { "Outer Rim Trade",   "OuterRimTrade.otf"     } },
+            { "translate_protobesh", { "Outer Rim Protobesh","OuterRimProtobesh.otf"} },
         };
 
         auto it = fontMap.find(command);
@@ -162,8 +162,8 @@ int main() {
             helpCommand(event);
         } else if(command == "translate") {
             translateCommand(event);
-        } else if (it != fontMap.end()) {
-            translateCommand(event, it->second);
+        } else if(it != fontMap.end()) {
+            translateCommand(event, it->second.first, it->second.second);
         } else if(command.find("holocron") != std::string::npos) {
             holocronCommand(event, command);
         } else {

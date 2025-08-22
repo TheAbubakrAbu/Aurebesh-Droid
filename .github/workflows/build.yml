@@ -1,17 +1,19 @@
 # .github/workflows/build.yml
 
-name: Build Aurebesh Droid Linux Binary
+name: Build & Release Aurebesh Droid (Linux)
 
 on:
   push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+    tags:
+      - "v*.*.*" 
 
 env:
   CMAKE_BUILD_TYPE: Release
   CCACHE_MAXSIZE: 200M
   BUILD_DIR: build
+
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -27,7 +29,7 @@ jobs:
         run: |
           sudo apt-get -qq update
           sudo apt-get -y -qq install \
-            build-essential cmake ninja-build ccache libssl-dev pkg-config
+            build-essential cmake ninja-build ccache libssl-dev pkg-config jq
           ccache --max-size=$CCACHE_MAXSIZE
           ccache -z
 
@@ -54,15 +56,22 @@ jobs:
           file $BUILD_DIR/AurebeshDroid
           test -x $BUILD_DIR/AurebeshDroid
 
-      - name: Rename binary
+      - name: Rename to Release asset name
         run: |
           mv $BUILD_DIR/AurebeshDroid $BUILD_DIR/LinuxBinary
+
+      - name: Create GitHub Release
+        id: create_release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+          files: ${{ env.BUILD_DIR }}/LinuxBinary
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Show ccache stats
         if: always()
         run: ccache -s
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: LinuxBinary
-          path: ${{ env.BUILD_DIR }}/LinuxBinary
