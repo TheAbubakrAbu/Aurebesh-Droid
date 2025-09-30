@@ -13,7 +13,7 @@
 
 using namespace std;
 
-const string thumbnail = "https://raw.githubusercontent.com/TheAbubakrAbu/Aurebesh-Droid/main/src/assets/images/aurebesh.png";
+const string thumbnail = "https://raw.githubusercontent.com/TheAbubakrAbu/Aurebesh-Droid/main/src/assets/images/aurebesh.jpg";
 const auto color = 0x4295E2;
 
 inline std::string to_alphabet_image_url(const std::string& name) {
@@ -67,12 +67,19 @@ inline void helpCommand(const dpp::slashcommand_t& event) {
 
         "### **Credits**\n"
         "• **Fonts:**\n"
-        "    • [Standard Aurebesh](https://www.fonts4free.net/aurebesh-font.html) by Pixel Sagas\n"
+        "    • [Basic Aurebesh](https://www.fonts4free.net/aurebesh-font.html) by Pixel Sagas\n"
+        "    • [Core Aurebesh](https://aurekfonts.github.io/?font=AurebeshAF) by AurekFonts\n"
         "    • [Cantina Aurebesh](https://www.fontspace.com/aurebesh-cantina-font-f22020) by Pixel Sagas\n"
+        "    • [Nexus Aurebesh](https://aurekfonts.github.io/?font=ABEquinox) by AurekFonts\n"
         "    • [Droid Aurebesh](https://www.fontspace.com/droidobesh-depot-font-f55049) by AurekFonts\n"
+        "    • [Pixel Aurebesh](https://aurekfonts.github.io/?font=AurebeshLU) by AurekFonts\n"
         "    • [Mando'a Fonts](http://www.erikstormtrooper.com/mandalorian.htm) by Erikstormtrooper\n"
-        "    • [Outer Rim](https://www.fontspace.com/outer-rim-af-font-f49641) by AurekFonts\n"
-        "    • [Sith Font](https://www.fontspace.com/sith-af-font-f49639) by AurekFonts\n"
+        "    • [Outer Rim Basic](https://www.fontspace.com/outer-rim-af-font-f49641) by AurekFonts\n"
+        "    • [Outer Rim Old Tongue](https://aurekfonts.github.io/?font=PrimeJedi) by AurekFonts\n"
+        "    • [Outer Rim Sith Script](https://aurekfonts.github.io/?font=SithAF) by AurekFonts\n"
+        "    • [Outer Rim Hive](https://aurekfonts.github.io/?font=GeonosianPM) by AurekFonts\n"
+        "    • [Outer Rim Trade](https://aurekfonts.github.io/?font=TFGunray) by AurekFonts\n"
+        "    • [Outer Rim Protobesh](https://aurekfonts.github.io/?font=ProtobeshAF) by AurekFonts\n"
         "\n"
         "• **Rendering Engine:** stb_truetype & stb_image_write by [Sean Barrett](https://github.com/nothings/stb)\n"
         "• **Bot Framework:** D++(DPP) C++ Library by [brainbox](https://github.com/brainboxdotcc/DPP)\n\n"

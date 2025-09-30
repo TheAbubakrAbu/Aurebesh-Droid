@@ -147,11 +147,12 @@ int main() {
             { "translate_mandoa_old", { "Old Mando'a", "MandoOld.otf" } },
 
             // Outer Rim
-            { "translate_outerrim",   { "Outer Rim Basic",   "OuterRimBasic.otf"     } },
-            { "translate_tongue",     { "Outer Rim Tongue",  "OuterRimTongue.otf"    } },
-            { "translate_geonosian", { "Outer Rim Geonosian","OuterRimHive.otf"     } },
-            { "translate_trade",     { "Outer Rim Trade",   "OuterRimTrade.otf"     } },
-            { "translate_protobesh", { "Outer Rim Protobesh","OuterRimProtobesh.otf"} },
+            { "translate_outerrim",   { "Outer Rim Basic",     "OuterRimBasic.otf"     } },
+            { "translate_tongue",     { "Outer Rim Tongue",    "OuterRimTongue.otf"    } },
+            { "translate_sith",      { "Outer Rim Sith",      "OuterRimSith.otf"    } },
+            { "translate_geonosian", { "Outer Rim Geonosian", "OuterRimHive.otf"     } },
+            { "translate_trade",     { "Outer Rim Trade",     "OuterRimTrade.otf"     } },
+            { "translate_protobesh", { "Outer Rim Protobesh", "OuterRimProtobesh.otf"} },
         };
 
         auto it = fontMap.find(command);

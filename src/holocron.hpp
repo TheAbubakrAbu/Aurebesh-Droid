@@ -19,11 +19,11 @@ struct HolocronInfo {
 };
 
 HolocronInfo get_holocron_metadata(const string& author, const string& command) {
-    string blue = "https://raw.githubusercontent.com/TheAbubakrAbu/Aurebesh-Droid/main/src/assets/images/blue.png";
-    string green = "https://raw.githubusercontent.com/TheAbubakrAbu/Aurebesh-Droid/main/src/assets/images/green.png";
-    string yellow = "https://raw.githubusercontent.com/TheAbubakrAbu/Aurebesh-Droid/main/src/assets/images/yellow.png";
-    string purple = "https://raw.githubusercontent.com/TheAbubakrAbu/Aurebesh-Droid/main/src/assets/images/purple.png";
-    //string red = "https://raw.githubusercontent.com/TheAbubakrAbu/Aurebesh-Droid/main/src/assets/images/red.png";
+    string blue = "https://raw.githubusercontent.com/TheAbubakrAbu/Aurebesh-Droid/main/src/assets/images/blue.jpg";
+    string green = "https://raw.githubusercontent.com/TheAbubakrAbu/Aurebesh-Droid/main/src/assets/images/green.jpg";
+    string yellow = "https://raw.githubusercontent.com/TheAbubakrAbu/Aurebesh-Droid/main/src/assets/images/yellow.jpg";
+    string purple = "https://raw.githubusercontent.com/TheAbubakrAbu/Aurebesh-Droid/main/src/assets/images/purple.jpg";
+    //string red = "https://raw.githubusercontent.com/TheAbubakrAbu/Aurebesh-Droid/main/src/assets/images/red.jpg";
     string bendu = "https://static.wikia.nocookie.net/starwars/images/3/34/Bendu.png/revision/latest?cb=20230312180517";
 
     if (author == "Bendu") {
