@@ -116,7 +116,7 @@ inline void translateCommand(
         ostringstream oss;
         oss << "aurebesh_" << event.command.usr.id << '_' << event.command.channel_id << '_'
             << chrono::duration_cast<chrono::milliseconds>(chrono::system_clock::now().time_since_epoch()).count()
-            << ".png";
+            << ".jpg";
 
         const string imgName = oss.str();
 
