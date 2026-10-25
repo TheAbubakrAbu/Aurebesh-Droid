@@ -73,12 +73,15 @@ jobs:
         if: always()
         run: ccache -s
 
-      - name: Restart Heroku dynos
-        if: always()
+      - name: Restart bot on Oracle server
         run: |
-          curl -X DELETE "https://api.heroku.com/apps/${HEROKU_APP_NAME}/dynos" \
-            -H "Accept: application/vnd.heroku+json; version=3" \
-            -H "Authorization: Bearer ${HEROKU_API_KEY}"
+          # The deploy key can only run fixed targets on the server (see ~/deploy.sh there)
+          install -m 600 /dev/null "$HOME/deploy_key"
+          printf '%s\n' "$ORACLE_SSH_KEY" > "$HOME/deploy_key"
+          echo "discord-bots ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKm/hUx9SzFwNdzIE1T+B156N/GDkHljKd8+96UW7TMN" > "$HOME/known_hosts"
+          ssh -i "$HOME/deploy_key" \
+              -o UserKnownHostsFile="$HOME/known_hosts" -o HostKeyAlias=discord-bots \
+              "ubuntu@${ORACLE_HOST}" aurebesh
         env:
-          HEROKU_APP_NAME: ${{ secrets.HEROKU_APP_NAME }}
-          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+          ORACLE_HOST: ${{ secrets.ORACLE_HOST }}
+          ORACLE_SSH_KEY: ${{ secrets.ORACLE_SSH_KEY }}

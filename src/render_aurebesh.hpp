@@ -164,7 +164,7 @@ inline bool renderTextToImage(
         }
     }
 
-    if(!stbi_write_png(outPath.c_str(), imageWidth, imageHeight, 1, image.data(), imageWidth)) {
+    if(!stbi_write_jpg(outPath.c_str(), imageWidth, imageHeight, 1, image.data(), imageWidth)) {
         cerr << "❌ Failed to save image.\n";
         return false;
     }
