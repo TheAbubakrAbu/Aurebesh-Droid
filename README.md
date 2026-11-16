@@ -102,7 +102,7 @@ The conventions every reply follows are written at the top of [`src/theme.hpp`](
 
 The public bot runs on an Oracle Cloud server as a systemd service.
 
-On every push to `main`, the [GitHub Actions workflow](.github/workflows/deploy.yml) builds a Linux release binary and runs its self-test, and only if it passes, publishes it as the `nightly` release (`LinuxBinary`) and restarts the bot on the server. When the bot starts, [`start-worker.sh`](start-worker.sh) downloads the `nightly` binary and runs it, falling back to the last downloaded copy if GitHub is unreachable. The fonts are compiled into the binary, so it needs no other files. The server checks the bot every 2 minutes and messages the owner on Discord if it goes down.
+On every push to `main`, the [GitHub Actions workflow](.github/workflows/deploy.yml) builds a Linux release binary and runs its self-test, and only if it passes, publishes it as the `nightly` pre-release (`LinuxBinary`) and restarts the bot on the server. Version releases (`v2.0` and on) are made by hand and never affect the server. When the bot starts, [`start-worker.sh`](start-worker.sh) downloads the `nightly` binary and runs it, falling back to the last downloaded copy if GitHub is unreachable. The fonts are compiled into the binary, so it needs no other files. The server checks the bot every 2 minutes and messages the owner on Discord if it goes down.
 
 The bot previously ran on Heroku; that setup lives in the deprecated [Aurebesh-Droid-Heroku](https://github.com/TheAbubakrAbu/Aurebesh-Droid-Heroku) repository.
 

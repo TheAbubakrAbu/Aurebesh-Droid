@@ -73,14 +73,17 @@ jobs:
         with:
           name: LinuxBinary
 
-      # start-worker.sh on the server downloads this release on every start.
+      # start-worker.sh on the server downloads this release by its tag on
+      # every start. It is a pre-release and never "latest", so the version
+      # releases (v2.0 and on) keep the Latest badge. Never delete or rename it.
       - name: Publish the nightly release
         run: mv AurebeshDroid LinuxBinary && chmod +x LinuxBinary
       - uses: softprops/action-gh-release@v3
         with:
           tag_name: nightly
           name: Nightly
-          make_latest: true
+          prerelease: true
+          make_latest: false
           files: LinuxBinary
 
       - name: Deploy to the Oracle server
