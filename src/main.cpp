@@ -1,176 +1,132 @@
 // main.cpp
+//
+// Starts the bot and routes every slash command, message menu, button, and
+// menu choice to the feature that handles it. `AurebeshDroid --self-test`
+// runs the checks in self_test.cpp instead.
 
 #include <cstdlib>
+#include <exception>
 #include <iostream>
-#include <unordered_map>
+#include <string>
+#include <string_view>
 
 #include <dpp/dpp.h>
 
+#include "alphabet.hpp"
 #include "commands.hpp"
+#include "help.hpp"
+#include "holocron.hpp"
+#include "quiz.hpp"
+#include "render_aurebesh.hpp"
+#include "replies.hpp"
+#include "self_test.hpp"
+#include "translate.hpp"
 
-using namespace std;
+namespace {
 
-int main() {
-    const char* token = getenv("DISCORD_TOKEN");
-    if(!token) {
-        cerr << "DISCORD_TOKEN environment variable not set\n";
-        return 1;
+// Runs a handler. If it throws, logs what failed and tells the person.
+template <typename Handler>
+void guarded(const dpp::interaction_create_t& event, const std::string& what, Handler&& handle) {
+    try {
+        handle();
+    } catch (const std::exception& e) {
+        event.owner->log(dpp::ll_error, what + " failed: " + e.what());
+        reply_notice(event, something_went_wrong);
+    }
+}
+
+void on_slash_command(const dpp::slashcommand_t& event) {
+    const std::string command = event.command.get_command_name();
+    guarded(event, "/" + command, [&] {
+        if (const Script* script = find_script(command)) translate_command(event, *script);
+        else if (command == "alphabet" || command == "aurebesh") alphabet_command(event);
+        else if (is_holocron_command(command)) holocron_command(event, command);
+        else if (command == "quiz") quiz_command(event);
+        else if (command == "help") help_command(event);
+    });
+}
+
+void on_message_menu(const dpp::message_context_menu_t& event) {
+    guarded(event, std::string(translate_message_menu), [&] {
+        if (event.command.get_command_name() == translate_message_menu) translate_message_command(event);
+    });
+}
+
+// "Open Another" under a holocron, the quiz's answers, and the Customize
+// buttons. A button nothing recognizes (from an older version) still gets an
+// answer, so Discord never shows "This interaction failed".
+void on_button(const dpp::button_click_t& event) {
+    const std::string& id = event.custom_id;
+    guarded(event, "Button " + id, [&] {
+        bool handled = false;
+        if (id.starts_with(holocron_prefix)) {
+            const std::string command = id.substr(holocron_prefix.size());
+            handled = is_holocron_command(command);
+            if (handled) holocron_command(event, command);
+        } else if (id.starts_with(quiz_prefix)) {
+            handled = quiz_control(event, id);
+        } else {
+            handled = style_control(event, id, "");
+        }
+        if (!handled) reply_notice(event, old_button);
+    });
+}
+
+// The Customize menus: script, color, and background.
+void on_menu_choice(const dpp::select_click_t& event) {
+    guarded(event, "Menu " + event.custom_id, [&] {
+        if (!style_control(event, event.custom_id, event.values.empty() ? "" : event.values.front())) reply_notice(event, old_button);
+    });
+}
+
+}  // namespace
+
+int main(int argc, char* argv[]) {
+    if (argc > 1 && std::string_view(argv[1]) == "--self-test") {
+        return self_test(argc > 2 ? argv[2] : nullptr);
     }
 
-    dpp::cluster bot(token, dpp::i_default_intents);
+    const char* token = std::getenv("DISCORD_TOKEN");
+    if (!token || !*token) {
+        std::cerr << "DISCORD_TOKEN environment variable not set\n";
+        return 1;
+    }
+    if (!aurebesh::load_fonts()) return 1;
 
-    bot.on_log(dpp::utility::cout_logger());
+    // Interactions arrive without any gateway intents, and nothing here reads
+    // D++'s cache, so subscribe to no events and cache nothing.
+    dpp::cluster bot(token, 0, 0, 0, 1, true, dpp::cache_policy::cpol_none);
 
-    bot.on_ready([&bot](const dpp::ready_t& event) {
-        dpp::activity playing(dpp::activity_type::at_game, "💠 Jedi Holocron", "", "");
+    bot.on_log([](const dpp::log_t& event) {
+        if (event.severity >= dpp::ll_info) {
+            std::cout << "[" << dpp::utility::current_date_time() << "] "
+                      << dpp::utility::loglevel(event.severity) << ": " << event.message << '\n';
+        }
+    });
+
+    bot.on_ready([&bot](const dpp::ready_t&) {
+        // "Playing 🔤 Aurebesh", like Sabacc Droid's "Playing 🃏 Sabacc".
+        dpp::activity playing(dpp::activity_type::at_game, theme::titled(theme::icon::translate, "Aurebesh"), "", "");
         bot.set_presence(dpp::presence(dpp::ps_online, playing));
+        bot.log(dpp::ll_info, "Aurebesh Droid is online as " + bot.me.username);
 
-        cout << "Bot is up: " << bot.me.username << '\n';
-
-        if(dpp::run_once<struct register_commands>()) {
-            std::vector<dpp::slashcommand> commands;
-
-            // --- Translation commands ---
-            commands.push_back(
-                dpp::slashcommand("translate", "Convert English text to Basic Aurebesh", bot.me.id)
-                    .add_option(dpp::command_option(dpp::co_string, "text", "Text to translate", true))
-            );
-
-            commands.push_back(
-                dpp::slashcommand("translate_basic", "Convert English text to Basic Aurebesh", bot.me.id)
-                    .add_option(dpp::command_option(dpp::co_string, "text", "Text to translate", true))
-            );
-
-            commands.push_back(
-                dpp::slashcommand("translate_core", "Convert English text to Core Aurebesh", bot.me.id)
-                    .add_option(dpp::command_option(dpp::co_string, "text", "Text to translate", true))
-            );
-
-            commands.push_back(
-                dpp::slashcommand("translate_cantina", "Convert English text to Cantina Aurebesh", bot.me.id)
-                    .add_option(dpp::command_option(dpp::co_string, "text", "Text to translate", true))
-            );
-
-            commands.push_back(
-                dpp::slashcommand("translate_nexus", "Convert English text to Nexus Aurebesh", bot.me.id)
-                    .add_option(dpp::command_option(dpp::co_string, "text", "Text to translate", true))
-            );
-
-            commands.push_back(
-                dpp::slashcommand("translate_droid", "Convert English text to Droid Aurebesh", bot.me.id)
-                    .add_option(dpp::command_option(dpp::co_string, "text", "Text to translate", true))
-            );
-
-            commands.push_back(
-                dpp::slashcommand("translate_pixel", "Convert English text to Pixel Aurebesh", bot.me.id)
-                    .add_option(dpp::command_option(dpp::co_string, "text", "Text to translate", true))
-            );
-
-            commands.push_back(
-                dpp::slashcommand("translate_mandoa_new", "Convert English text to New Mando'a", bot.me.id)
-                    .add_option(dpp::command_option(dpp::co_string, "text", "Text to translate", true))
-            );
-
-            commands.push_back(
-                dpp::slashcommand("translate_mandoa_old", "Convert English text to Old Mando'a", bot.me.id)
-                    .add_option(dpp::command_option(dpp::co_string, "text", "Text to translate", true))
-            );
-
-            commands.push_back(
-                dpp::slashcommand("translate_outerrim", "Convert English text to Outer Rim", bot.me.id)
-                    .add_option(dpp::command_option(dpp::co_string, "text", "Text to translate", true))
-            );
-
-            commands.push_back(
-                dpp::slashcommand("translate_tongue", "Convert English text to Outer Rim Sith Tongue", bot.me.id)
-                    .add_option(dpp::command_option(dpp::co_string, "text", "Text to translate", true))
-            );
-
-            commands.push_back(
-                dpp::slashcommand("translate_geonosian", "Convert English text to Outer Rim Geonosian", bot.me.id)
-                    .add_option(dpp::command_option(dpp::co_string, "text", "Text to translate", true))
-            );
-
-            commands.push_back(
-                dpp::slashcommand("translate_trade", "Convert English text to Outer Rim Trade Federation", bot.me.id)
-                    .add_option(dpp::command_option(dpp::co_string, "text", "Text to translate", true))
-            );
-
-            commands.push_back(
-                dpp::slashcommand("translate_protobesh", "Convert English text to Outer Rim Protobesh", bot.me.id)
-                    .add_option(dpp::command_option(dpp::co_string, "text", "Text to translate", true))
-            );
-
-            // --- Other commands ---
-            commands.push_back(
-                dpp::slashcommand("alphabet", "Display the Aurebesh alphabet", bot.me.id)
-            );
-
-            commands.push_back(
-                dpp::slashcommand("aurebesh", "Display the Aurebesh alphabet", bot.me.id)
-            );
-
-            commands.push_back(
-                dpp::slashcommand("holocron", "Use the Force and unlock the secrets of the Jedi or the Sith", bot.me.id)
-            );
-
-            commands.push_back(
-                dpp::slashcommand("holocron_jedi", "Use the Force and unlock the secrets of the Jedi", bot.me.id)
-            );
-
-            commands.push_back(
-                dpp::slashcommand("holocron_sith", "Use the Force and unlock the secrets of the Sith", bot.me.id)
-            );
-
-            commands.push_back(
-                dpp::slashcommand("help", "Display Aurebesh Droid Help", bot.me.id)
-            );
-
-            bot.global_bulk_command_create(commands);
+        if (dpp::run_once<struct register_commands>()) {
+            bot.global_bulk_command_create(build_commands(bot.me.id, true), [&bot](const dpp::confirmation_callback_t& done) {
+                if (!done.is_error()) {
+                    bot.log(dpp::ll_info, "Commands registered for servers and personal installs");
+                    return;
+                }
+                bot.log(dpp::ll_warning, "Discord refused personal-install commands (" + done.get_error().human_readable +
+                                         "). Turn on User Install in the Developer Portal; registering for servers only.");
+                bot.global_bulk_command_create(build_commands(bot.me.id, false));
+            });
         }
     });
 
-    bot.on_slashcommand([&bot](const dpp::slashcommand_t& event) {
-        const std::string command = event.command.get_command_name();
+    bot.on_slashcommand(on_slash_command);
+    bot.on_message_context_menu(on_message_menu);
+    bot.on_button_click(on_button);
+    bot.on_select_click(on_menu_choice);
 
-        static const std::unordered_map<std::string, std::pair<std::string, std::string>> fontMap = {
-            // Aurebesh
-            { "translate_basic",      { "Aurebesh Basic",   "AurebeshBasic.otf"   } },
-            { "translate_core",       { "Aurebesh Core",    "AurebeshCore.otf"    } },
-            { "translate_cantina",    { "Aurebesh Cantina", "AurebeshCantina.otf" } },
-            { "translate_nexus",      { "Aurebesh Nexus",   "AurebeshEquinox.otf" } },
-            { "translate_droid",      { "Aurebesh Droid",   "AurebeshDroid.otf"   } },
-            { "translate_pixel",      { "Aurebesh Pixel",   "AurebeshPixel.otf"   } },
-
-            // Mando'a
-            { "translate_mandoa_new", { "New Mando'a", "MandoNew.otf" } },
-            { "translate_mandoa_old", { "Old Mando'a", "MandoOld.otf" } },
-
-            // Outer Rim
-            { "translate_outerrim",   { "Outer Rim Basic",     "OuterRimBasic.otf"     } },
-            { "translate_tongue",     { "Outer Rim Tongue",    "OuterRimTongue.otf"    } },
-            { "translate_sith",      { "Outer Rim Sith",      "OuterRimSith.otf"    } },
-            { "translate_geonosian", { "Outer Rim Geonosian", "OuterRimHive.otf"     } },
-            { "translate_trade",     { "Outer Rim Trade",     "OuterRimTrade.otf"     } },
-            { "translate_protobesh", { "Outer Rim Protobesh", "OuterRimProtobesh.otf"} },
-        };
-
-        auto it = fontMap.find(command);
-
-        if(command == "alphabet" || command == "aurebesh") {
-            alphabetCommand(event);
-        } else if(command == "help") {
-            helpCommand(event);
-        } else if(command == "translate") {
-            translateCommand(event);
-        } else if(it != fontMap.end()) {
-            translateCommand(event, it->second.first, it->second.second);
-        } else if(command.find("holocron") != std::string::npos) {
-            holocronCommand(event, command);
-        } else {
-            //
-        }
-    });
-    
     bot.start(dpp::st_wait);
 }

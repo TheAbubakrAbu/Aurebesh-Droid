@@ -1,40 +1,37 @@
 #!/usr/bin/env bash
 # start-worker.sh
-
-# One-time setup:
-#   chmod +x start-worker.sh
+#
+# Downloads the newest build and starts the bot. The server's systemd service
+# runs this. One-time setup: chmod +x start-worker.sh
 
 set -euo pipefail
 
 OWNER="TheAbubakrAbu"
 REPO="Aurebesh-Droid"
+# build.yml uploads every build to this fixed tag. Download from the tag
+# directly rather than "latest", so a hand-made release can't hide the binary.
+TAG="nightly"
 ASSET_NAME="LinuxBinary"
 BIN="./LinuxBinary"
 
-API="https://api.github.com/repos/$OWNER/$REPO/releases/latest"
+URL="https://github.com/$OWNER/$REPO/releases/download/$TAG/$ASSET_NAME"
 
-AUTH_HEADER=()
-if [[ -n "${GH_TOKEN:-}" ]]; then
-  AUTH_HEADER=(-H "Authorization: Bearer $GH_TOKEN")
-fi
-
-# Extract the browser_download_url for the exact asset name, without jq
-JSON="$(curl -fsSL "${AUTH_HEADER[@]}" "$API")"
-URL="$(printf '%s\n' "$JSON" \
-  | sed -nE "s/.*\"browser_download_url\" *: *\"([^\"]*\/$ASSET_NAME)\".*/\1/p" \
-  | head -n1)"
-
-if [[ -z "${URL:-}" ]]; then
-  echo "ERROR: Could not find asset named '$ASSET_NAME' in latest release of $OWNER/$REPO"
-  exit 1
-fi
-
+# Download to a temp file first so a failed download never clobbers the
+# binary from the last good start.
+TMP="$BIN.download"
 echo "Downloading: $URL"
-curl -fL --retry 3 --retry-delay 2 "${AUTH_HEADER[@]}" -o "$BIN" "$URL"
-chmod +x "$BIN"
+if curl -fsSL --retry 3 --retry-delay 2 -o "$TMP" "$URL"; then
+  chmod +x "$TMP"
+  mv -f "$TMP" "$BIN"
+else
+  rm -f "$TMP"
+  if [[ -x "$BIN" ]]; then
+    echo "WARNING: download failed, starting the existing $BIN instead"
+  else
+    echo "ERROR: download failed and there is no existing $BIN to fall back on"
+    exit 1
+  fi
+fi
 
-# Fonts next to the binary for exe_dir()/assets/fonts
-mkdir -p assets/fonts
-cp -r src/assets/fonts/* assets/fonts/ 2>/dev/null || true
-
+# The fonts are compiled into the binary, so nothing else needs copying.
 exec "$BIN"

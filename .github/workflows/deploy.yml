@@ -1,0 +1,99 @@
+# .github/workflows/deploy.yml
+#
+# On every push to main: build the bot and run the self-test, and only if it
+# passes, publish the build and restart the bot on the Oracle server.
+# Sabacc Droid's workflow has the same two jobs.
+
+name: Test and Deploy Aurebesh Droid
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:  # or run it by hand from the Actions tab
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+env:
+  BUILD_DIR: build
+  # ccache defaults to ~/.cache/ccache on Ubuntu 24.04. Keep it in the
+  # workspace instead, where the cache step below saves and restores it.
+  CCACHE_DIR: ${{ github.workspace }}/.ccache
+  CCACHE_BASEDIR: ${{ github.workspace }}
+  CCACHE_MAXSIZE: 200M
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          submodules: recursive
+
+      # ccache keeps D++'s compiled objects between runs, so a push only
+      # recompiles what changed. Every run saves a new cache, and the next run
+      # restores the newest one.
+      - uses: actions/cache@v6
+        with:
+          path: .ccache
+          key: ccache-${{ runner.os }}-${{ github.sha }}
+          restore-keys: ccache-${{ runner.os }}-
+
+      - name: Install the build tools
+        run: |
+          sudo apt-get -qq update
+          sudo apt-get -y -qq install build-essential cmake ninja-build ccache libssl-dev pkg-config
+          ccache -z
+
+      - name: Build the release binary
+        run: |
+          cmake -S . -B $BUILD_DIR -G Ninja -DCMAKE_BUILD_TYPE=Release \
+                -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
+          cmake --build $BUILD_DIR --target AurebeshDroid --parallel $(nproc)
+          ls -lh $BUILD_DIR/AurebeshDroid
+          ccache -s
+
+      - name: Run the self-test
+        run: $BUILD_DIR/AurebeshDroid --self-test
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: LinuxBinary
+          path: ${{ env.BUILD_DIR }}/AurebeshDroid
+          retention-days: 7
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write  # to publish the nightly release
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          name: LinuxBinary
+
+      # start-worker.sh on the server downloads this release on every start.
+      - name: Publish the nightly release
+        run: mv AurebeshDroid LinuxBinary && chmod +x LinuxBinary
+      - uses: softprops/action-gh-release@v3
+        with:
+          tag_name: nightly
+          name: Nightly
+          make_latest: true
+          files: LinuxBinary
+
+      - name: Deploy to the Oracle server
+        run: |
+          # The deploy key can only run fixed targets on the server (see ~/deploy.sh there).
+          # Passing the tested commit means a push made during the test never goes live untested.
+          install -m 600 /dev/null "$HOME/deploy_key"
+          printf '%s\n' "$ORACLE_SSH_KEY" > "$HOME/deploy_key"
+          echo "discord-bots ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKm/hUx9SzFwNdzIE1T+B156N/GDkHljKd8+96UW7TMN" > "$HOME/known_hosts"
+          ssh -i "$HOME/deploy_key" \
+              -o UserKnownHostsFile="$HOME/known_hosts" -o HostKeyAlias=discord-bots \
+              "ubuntu@${ORACLE_HOST}" "aurebesh $TESTED_COMMIT"
+        env:
+          ORACLE_HOST: ${{ secrets.ORACLE_HOST }}
+          ORACLE_SSH_KEY: ${{ secrets.ORACLE_SSH_KEY }}
+          TESTED_COMMIT: ${{ github.sha }}
