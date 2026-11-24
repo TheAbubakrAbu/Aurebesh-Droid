@@ -106,6 +106,10 @@ On every push to `main`, the [GitHub Actions workflow](.github/workflows/deploy.
 
 The bot previously ran on Heroku; that setup lives in the deprecated [Aurebesh-Droid-Heroku](https://github.com/TheAbubakrAbu/Aurebesh-Droid-Heroku) repository.
 
+## Bot Lists
+
+Aurebesh Droid is on [top.gg](https://top.gg/bot/1385123544090017882), [Discord Bot List](https://discordbotlist.com/bots/aurebesh-droid), [Discord Bots](https://discord.bots.gg/bots/1385123544090017882) and Discord's App Directory. It is waiting for review on Discordlist, Discord Extreme List, Botlist.me, Topbot.gg, TheDiscordList and Radarcord. [`docs/bot-lists.md`](docs/bot-lists.md) has every listing's link, status and settings, and the text they all use.
+
 ## More Star Wars
 
 - **[Sabacc Droid](https://github.com/TheAbubakrAbu/Sabacc-Droid)**: A Discord bot for playing Sabacc, the Star Wars card game, with up to 8 players. [Add it to your server](https://discord.ly/sabaac-droid).
